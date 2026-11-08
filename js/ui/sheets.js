@@ -45,7 +45,7 @@ function SaleSheet() {
 
 const SEAL_TEXT = { paid: 'Payment received', pending: 'Awaiting payment', draft: 'Draft receipt', voided: 'Receipt cancelled' };
 
-const correctionButton = (action, label, icon) => html`<button class="btn quiet-danger sm" style="height:36px;padding:0 12px;border-radius:11px;font-size:12.5px;background:transparent;color:var(--red);box-shadow:inset 0 0 0 1.5px rgba(200,55,45,.24);" data-a="${action}">${icon(icon, 14)} ${label}</button>`;
+const correctionButton = (action, label, iconName) => html`<button class="btn quiet-danger sm" style="height:36px;padding:0 12px;border-radius:11px;font-size:12.5px;background:transparent;color:var(--red);box-shadow:inset 0 0 0 1.5px rgba(200,55,45,.24);" data-a="${action}">${icon(iconName, 14)} ${label}</button>`;
 
 function ReceiptSheet() {
   const s = findSale(U.rid);
@@ -73,7 +73,7 @@ function ReceiptSheet() {
     html`<button data-a="share" data-v="${id}"><span style="background:${bg}">${icon(id, 22, fg)}</span>${name}</button>`)}</div>
   ${s.status === 'pending' ? html`${pendingBlock}<div class="row between mt14"><span class="xs muted">Made a mistake?</span>${correctionButton('cancelReceipt', 'Cancel receipt', 'x')}</div>` : ''}
   ${s.status === 'draft' ? html`<button class="btn full mt18" data-a="finalise">${icon('send', 18)} Finalise &amp; send</button><div class="row between mt12"><span class="xs muted">Made a mistake?</span>${correctionButton('cancelReceipt', 'Cancel receipt', 'x')}</div>` : ''}
-  ${s.status === 'paid' ? html`<div class="row between mt18"><span class="xs muted">Need to correct this receipt?</span>${correctionButton('voidReceipt', 'Void &amp; correct', 'undo')}</div>` : ''}
+  ${s.status === 'paid' ? html`<div class="row between mt18"><span class="xs muted">Need to correct this receipt?</span>${correctionButton('voidReceipt', 'Void &amp; correct', 'trash')}</div>` : ''}
   <button class="btn ghost full mt12" data-a="close">Done</button>`;
 }
 
