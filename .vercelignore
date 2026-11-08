@@ -1,0 +1,9 @@
+# Keep uploaded backups and development material off the deployed site.
+*.zip
+**/*.zip
+docs/**
+tests/**
+prototypes/**
+archive/**
+README.md
+# Do not exclude the root PNGs, js/, css/, manifest.webmanifest or sw.js.
