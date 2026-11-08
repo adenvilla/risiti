@@ -1,27 +1,26 @@
-/**
- * Risiti - enrollment in three screens:
- *   1. Welcome  2. Phone + auto-verified code  3. Shop name + type.
- * Everything else (Till, logo, products) lives in the Home checklist.
- */
-
+/** Risiti enrollment: welcome, demo phone verification, shop setup. */
 const WELCOME_POINTS = [
-  ['wa', 'Receipts on WhatsApp', 'Send a professional receipt in seconds'],
-  ['phone', 'Get paid with M-Pesa', 'STK push and payment confirmation'],
-  ['box', 'Stock and daily sales', 'Know what to restock every evening'],
+  ['wa', 'Receipts worth sharing', 'Send receipts on WhatsApp or SMS'],
+  ['phone', 'Payments kept clear', 'Track paid and pending sales'],
+  ['box', 'Stock at a glance', 'Know what needs restocking'],
 ];
-
-const WelcomeScreen = () => html`<div class="screen welcome">
-  <span class="orb o0" style="background:#34d399"></span><span class="orb o1" style="background:#C9A24B"></span><div class="pattern-layer"></div><i class="frame-line"></i>
-  <div class="w-top">${brandLogo(104)}<h1 class="w-brand">Risiti</h1><span class="w-sub">Smart receipts for every shop</span></div>
-  <div class="w-mid">
-    <h2 class="w-title">Receipts, M-Pesa and stock — <em>in one simple app</em></h2>
-    <div class="w-list">${WELCOME_POINTS.map(([ic, title, sub], i) => html`<div class="w-item" style="animation-delay:${0.15 + i * 0.12}s"><span class="w-ico">${icon(ic, 20)}</span><div><b>${title}</b><span class="xs block">${sub}</span></div></div>`)}</div>
+const WelcomeScreen = () => html`<div class="screen welcome rw-welcome">
+  <style>
+  .rw-welcome{padding:24px 24px calc(24px + var(--safe-b));background:linear-gradient(155deg,#245443 0%,#17382D 50%,#0b2119 100%);color:#FFFCF6;overflow-y:auto;gap:22px}
+  .rw-welcome .rw-header{display:flex;align-items:center;gap:11px;flex:none}.rw-welcome .rw-brand{font-family:var(--serif);font-size:25px;font-weight:600}.rw-welcome .rw-tagline{display:block;font-size:10px;letter-spacing:1.4px;color:#d6e0d6;margin-top:2px;text-transform:uppercase}
+  .rw-welcome .rw-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px;min-height:min-content}.rw-welcome .rw-eyebrow{font-size:10px;font-weight:700;letter-spacing:2px;color:#E6C877}.rw-welcome .rw-title{font-size:43px;line-height:1.08;letter-spacing:-1px;margin:12px 0 14px;font-weight:600}.rw-welcome .rw-title em{color:#E6C877;font-weight:500}.rw-welcome .rw-description{font-size:14px;line-height:1.65;color:#dae5dc;max-width:310px}
+  .rw-welcome .rw-preview{border:1px solid #E6C87738;border-radius:22px;background:#ffffff08;padding:12px}.rw-welcome .rw-preview-label{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#d6e0d6;padding:1px 3px 11px}.rw-welcome .rw-receipt{background:#FFFCF6;border-radius:13px;padding:17px;color:#17382D}.rw-welcome .rw-shop{font-family:var(--serif);font-size:17px}.rw-welcome .rw-caption{font-size:10px;color:#68766c;margin-top:3px}.rw-welcome .rw-line{display:flex;justify-content:space-between;gap:12px;font-size:12px;line-height:1.5;margin-top:9px}.rw-welcome .rw-rule{border-top:1px dashed #d9d1bf;margin:12px 0}.rw-welcome .rw-total{display:flex;align-items:center;justify-content:space-between;font-size:12px}.rw-welcome .rw-total b{font-family:var(--serif);font-size:24px}.rw-welcome .rw-share{display:flex;align-items:center;gap:7px;font-size:11px;color:#dae5dc;padding:11px 3px 1px}
+  .rw-welcome .rw-benefits{display:flex;flex-direction:column;gap:11px}.rw-welcome .rw-benefit{display:flex;align-items:center;gap:11px}.rw-welcome .rw-benefit-icon{width:30px;height:30px;border:1px solid #E6C87735;background:#ffffff08;border-radius:9px;display:grid;place-items:center;flex:none;color:#E6C877}.rw-welcome .rw-benefit b{display:block;font-size:12px;font-weight:600}.rw-welcome .rw-benefit small{display:block;font-size:11px;color:#c6d5c9;line-height:1.5;margin-top:1px}
+  .rw-welcome .rw-footer{flex:none}.rw-welcome .rw-start{width:100%;min-height:52px;padding:12px 18px;border-radius:15px;background:#E6C877;color:#17382D;font-weight:700;font-size:15px;display:flex;justify-content:center;align-items:center;gap:10px}.rw-welcome .rw-links{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}.rw-welcome .rw-links button{min-height:44px;color:#E8EEE2;font-size:12px;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#ffffff50}.rw-welcome .rw-note{text-align:center;font-size:10px;color:#bdcfc2;margin-top:3px;line-height:1.5}
+  @media(max-height:740px){.rw-welcome{padding-top:18px;gap:15px}.rw-welcome .rw-body{gap:16px}.rw-welcome .rw-title{font-size:35px;margin:8px 0 10px}.rw-welcome .rw-description{font-size:13px}.rw-welcome .rw-receipt{padding:13px}.rw-welcome .rw-benefits{gap:8px}}
+  </style>
+  <header class="rw-header">${brandLogo(46)}<div><b class="rw-brand">Risiti</b><span class="rw-tagline">Smart receipts</span></div></header>
+  <div class="rw-body"><div><span class="rw-eyebrow">FOR YOUR EVERYDAY BIASHARA</span><h1 class="rw-title">Every sale.<br><em>Recorded.</em></h1><p class="rw-description">Professional receipts. Clear payments. Stock you can keep track of — all in one simple app.</p></div>
+    <div class="rw-preview"><div class="rw-preview-label"><span>A little clarity for every sale</span><span>Example</span></div><div class="rw-receipt"><b class="rw-shop">Mama Njeri Store</b><p class="rw-caption">Digital receipt · Example</p><div class="rw-rule"></div><div class="rw-line"><span>Maize flour × 2</span><b>${money(280)}</b></div><div class="rw-line"><span>Cooking oil 1L</span><b>${money(320)}</b></div><div class="rw-rule"></div><div class="rw-total"><span>Total</span><b>${money(600)}</b></div></div><div class="rw-share">${icon('wa',15)} Ready to share on WhatsApp</div></div>
+    <div class="rw-benefits">${WELCOME_POINTS.map(([ic,title,sub])=>html`<div class="rw-benefit"><span class="rw-benefit-icon">${icon(ic,16)}</span><div><b>${title}</b><small>${sub}</small></div></div>`)}</div>
   </div>
-  <div class="w-bottom">
-    <span class="timer-chip">${icon('bolt', 14)} Set up in under 60 seconds</span>
-    <button class="btn foil full mt14" data-a="start"><span>Get started</span> ${icon('arrow', 18)}</button>
-    <div class="row center gap14 mt14 small"><button class="w-link" data-a="tour">See how it works</button><i class="sep"></i><button class="w-link" data-a="demo">Try demo shop</button></div>
-  </div></div>`;
+  <div class="rw-footer"><button class="rw-start" data-a="start">Get started ${icon('arrow',18)}</button><div class="rw-links"><button data-a="tour">See how it works</button><button data-a="demo">Try demo shop</button></div><p class="rw-note">Demo shop uses sample data.</p></div>
+</div>`;
 
 const otpBoxes = () => Array.from({ length: OTP_LENGTH }, (_, i) =>
   html`<div class="ob${U.otp[i] ? ' f' : ''}${U.otp.length === OTP_LENGTH ? ' ok' : ''}${i === U.otp.length ? ' c' : ''}">${U.otp[i] ? '•' : ''}</div>`);
