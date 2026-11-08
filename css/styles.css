@@ -1,4 +1,24 @@
-/* Original premium rules, split at section boundaries without changing their order. */
-@import url('./base.css');
-@import url('./screens.css');
-@import url('./tour.css');
+/* Add polished shared UI foundations: consistent spacing scale, card elevation, form focus states, chips, buttons, empty states, sheet headers, and setup progress indicators. Preserve the existing emerald-and-gold Risiti visual direction. */
+:root{--r-space-1:6px;--r-space-2:10px;--r-space-3:14px;--r-space-4:18px;--r-space-5:24px;--r-radius-sm:10px;--r-radius-md:14px;--r-radius-lg:20px;--r-shadow-1:0 1px 2px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.06);--r-shadow-2:0 2px 6px rgba(15,23,42,.08),0 12px 28px rgba(15,23,42,.08)}
+.card,.inp,.stat,.tile,.task,.item,.srow,.receipt,.summary-block{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease}
+.card{border-radius:var(--r-radius-lg);box-shadow:var(--r-shadow-1)}
+.card:active{transform:scale(.995)}
+.inp:focus-within{border-color:#0F9D58;box-shadow:0 0 0 3px rgba(15,157,88,.12)}
+.btn{border-radius:var(--r-radius-md);font-weight:700;letter-spacing:.01em}
+.btn.foil{box-shadow:0 8px 20px rgba(15,157,88,.18)}
+.btn.foil:active{transform:scale(.985)}
+.btn.ghost{background:transparent;border:1px solid rgba(15,23,42,.12);color:#17382D}
+.chip{border-radius:999px;transition:background-color .18s ease,color .18s ease,border-color .18s ease}
+.chip.on{box-shadow:0 2px 8px rgba(15,157,88,.16)}
+.empty-state{padding:28px 18px;text-align:center}
+.empty-state .empty-title{font-size:16px;font-weight:700;color:#17382D}
+.empty-state .empty-sub{margin-top:6px;font-size:13px;line-height:1.5;color:#6B7280}
+.setup-progress{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.setup-step{display:flex;align-items:center;gap:6px;color:#9CA3AF;font-size:11px;font-weight:600}
+.setup-step span{width:22px;height:22px;border-radius:999px;display:grid;place-items:center;border:1px solid #E5E7EB;background:#fff}
+.setup-step.on{color:#0F9D58}.setup-step.on span{border-color:#0F9D58;background:#EAF7F0;color:#0F9D58}
+.setup-step.done{color:#0F9D58}.setup-step.done span{border-color:#0F9D58;background:#0F9D58;color:#fff}
+.sheet{border-top-left-radius:24px;border-top-right-radius:24px;box-shadow:var(--shadow-2,var(--r-shadow-2))}
+.sheet-header{padding:18px 20px 12px;border-bottom:1px solid rgba(15,23,42,.06)}
+.sheet-body{padding:16px 20px calc(24px + var(--safe-b))}
+@media(prefers-reduced-motion:reduce){.card,.inp,.btn,.chip,.tile,.task,.item,.srow,.receipt,.summary-block{transition:none}}
