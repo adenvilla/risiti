@@ -1,9 +1,10 @@
-/** Safe-by-default templates, formatting, dates, phones and receipt arithmetic. */
+/** Safe templates and decimal-preserving formatting. VAT policy remains whole-shilling. */
 class Raw{constructor(s){this.s=s}}
 const raw=s=>new Raw(s),esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const renderValue=v=>v instanceof Raw?v.s:Array.isArray(v)?v.map(renderValue).join(''):v==null||v===false?'':esc(v);
 const html=(strings,...values)=>raw(strings.reduce((o,s,i)=>o+s+(i<values.length?renderValue(values[i]):''),''));
-const $=s=>document.querySelector(s),money=n=>'KSh '+Math.round(n).toLocaleString('en-US'),moneyH=n=>html`<span class="cur">KSh</span>${Math.round(n).toLocaleString('en-US')}`;
+const currencyNumber=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const $=s=>document.querySelector(s),money=n=>'KSh '+currencyNumber(n),moneyH=n=>html`<span class="cur">KSh</span>${currencyNumber(n)}`;
 const sameDay=(a,b)=>new Date(a).toDateString()===new Date(b).toDateString();
 const ymd=t=>{const d=new Date(t);return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`};
 const dayLabel=t=>sameDay(t,Date.now())?'Today':sameDay(t,Date.now()-DAY)?'Yesterday':new Date(t).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
