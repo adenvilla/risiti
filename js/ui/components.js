@@ -14,10 +14,10 @@ const segmented = (action, current) => html`<div class="seg" role="tablist">${['
 const phoneField = (path, value, extra = '') => html`<div class="row"><div class="inp prefix">🇰🇪 +254</div>
   <div class="inp suffix grow"><input data-i="${path}" ${raw(extra)} data-n="1" inputmode="numeric" maxlength="10" placeholder="712 345 678" value="${value}" aria-label="Phone number"></div></div>`;
 
-const STATUS = { paid: ['Paid', '#1F7A4D'], pending: ['Pending', '#A9741A'], draft: ['Draft', '#8B95A1'] };
+const STATUS = { paid: ['Paid', '#1F7A4D'], pending: ['Pending', '#A9741A'], draft: ['Draft', '#8B95A1'], voided: ['Voided', '#C8372D'] };
 
 const saleRow = (s) => {
-  const [label, color] = STATUS[s.status];
+  const [label, color] = Object.prototype.hasOwnProperty.call(STATUS, s.status) ? STATUS[s.status] : ['Unknown status', '#8B95A1'];
   return html`<button class="card row item" data-a="openSale" data-v="${s.id}">
     ${iconTile(s.pay === 'cash' ? 'cash' : 'phone')}
     <span class="grow"><b class="ell block title">${itemsLabel(s)}</b><span class="xs faint ell block">${timeLabel(s.ts)} · ${formatPhone(s.phone)}</span></span>
