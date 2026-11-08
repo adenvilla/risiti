@@ -30,7 +30,7 @@ function saveState(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(S));if(
 const S=loadState();
 const emptyDraft=()=>({items:[],pay:'mpesa',phone:'',disc:'',note:'',name:'',qty:'1',price:''});
 const U={scr:S.authed&&S.done?'main':S.done?'auth':'welcome',tab:'home',slide:0,filter:'All',query:'',custQuery:'',cd:OTP_RESEND_SECONDS,otp:'',otpSent:false,phone:S.lastPhone||'',err:'',draft:emptyDraft(),sheet:'',sheetIn:false,rid:'',showQr:false,shopEdit:{},newProd:{n:'',p:'',s:''},setup:{name:'',cat:SHOP_CATEGORIES[0]}};
-const liveSales=()=>S.sales.filter(s=>s.status!=='draft'),sumOf=list=>list.reduce((a,s)=>a+saleTotals(s).total,0),periodSales=f=>liveSales().filter(s=>inPeriod(s.ts,f)),dayTotal=t=>sumOf(liveSales().filter(s=>sameDay(s.ts,t))),dailySeries=(n=7)=>Array.from({length:n},(_,i)=>dayTotal(Date.now()-(n-1-i)*DAY)),findSale=id=>S.sales.find(s=>s.id===id),findProduct=name=>S.products.find(p=>p.n.toLowerCase()===String(name).toLowerCase());
+const liveSales=()=>S.sales.filter(s=>s.status!=='draft'&&s.status!=='voided'),sumOf=list=>list.reduce((a,s)=>a+saleTotals(s).total,0),periodSales=f=>liveSales().filter(s=>inPeriod(s.ts,f)),dayTotal=t=>sumOf(liveSales().filter(s=>sameDay(s.ts,t))),dailySeries=(n=7)=>Array.from({length:n},(_,i)=>dayTotal(Date.now()-(n-1-i)*DAY)),findSale=id=>S.sales.find(s=>s.id===id),findProduct=name=>S.products.find(p=>p.n.toLowerCase()===String(name).toLowerCase());
 const stockState=p=>p.stock==null?'untracked':p.stock<=0?'out':p.stock<=p.low?'low':'ok',lowStock=()=>S.products.filter(p=>['low','out'].includes(stockState(p)));
 function setupTasks(){return [
 {id:'sale',icon:'plus',label:'Make your first sale',sub:'Takes about 10 seconds',done:S.sales.length>0,action:'newSale'},
