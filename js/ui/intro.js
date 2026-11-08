@@ -1,75 +1,26 @@
-/** Risiti - optional "How it works" tour (story-style progress bars). */
-
-const demoRows = (rows) => rows.map(([name, amount], i) =>
-  html`<div class="r-line" style="animation-delay:${0.25 + i * 0.18}s"><span>${name}</span><b>${money(amount)}</b></div>`);
-
+/** Risiti — focused, illustrative onboarding tour. Navigation remains in Actions. */
+const demoRows = rows => rows.map(([name, amount]) => html`<div class="ri-line"><span>${name}</span><b>${money(amount)}</b></div>`);
+const introPreview = (label, body) => html`<div class="ri-preview"><div class="ri-preview-head"><span class="ri-preview-dot"></span><span>${label}</span><small>Example</small></div>${body}</div>`;
 const SLIDES = [
-  {
-    bg: 'linear-gradient(160deg,#245443 0%,#0b1f17 75%)', orbs: ['#34d399', '#C9A24B'], tag: 'Instant receipts',
-    title: html`Send <em>pro receipts</em> in seconds`, text: 'Build a sale in a few taps and share it on WhatsApp, SMS or QR.',
-    visual: () => html`<div class="stage">
-      <div class="paper float">
-        <div class="paper-head">${brandLogo(34)}<div><b>Mama Njeri Store</b><span class="xs muted block">Official receipt</span></div></div>
-        ${demoRows([['Maize flour × 2', 280], ['Cooking oil 1L', 320], ['Sugar × 2', 380], ['Bread', 70]])}
-        <div class="r-total"><span>Total</span><b>KSh 1,050</b></div>
-      </div>
-      <span class="float-chip c1" style="background:#25D366">${icon('wa', 18, '#fff')} Sent on WhatsApp</span>
-      <span class="float-chip c2" style="background:#3B82F6">${icon('sms', 18, '#fff')} SMS</span>
-    </div>`,
-  },
-  {
-    bg: 'linear-gradient(160deg,#0e3a57 0%,#071e2e 72%)', orbs: ['#38bdf8', '#34d399'], tag: 'M-Pesa payments',
-    title: html`Get paid the <em>M-Pesa way</em>`, text: 'Send an STK push to the customer and watch the sale turn Paid, with the M-Pesa reference.',
-    visual: () => html`<div class="stage">
-      <div class="ring r1"></div><div class="ring r2"></div>
-      <div class="notif float"><div class="row gap8"><span class="mp">M-PESA</span><span class="xs">now</span></div>
-        <b class="block mt6">SK3L9QX2MA Confirmed</b>
-        <span class="xs block mt6">KSh 2,000.00 received from JOHN KAMAU 0711 188 464 for Till 455484.</span></div>
-      <div class="qrcard float-slow">${qrSvg('Pay KSh 2,000 to Till 455484 - Mama Njeri Store')}<span class="xs">Scan to pay</span></div>
-    </div>`,
-  },
-  {
-    bg: 'linear-gradient(160deg,#5b3a0a 0%,#25190a 72%)', orbs: ['#f59e0b', '#fb7185'], tag: 'Smart stock',
-    title: html`Never <em>run out</em> of what sells`, text: 'Stock drops with every sale. Low-stock alerts tell you what to buy before customers ask.',
-    visual: () => html`<div class="stage">
-      <div class="glass float">
-        ${[['Maize flour 2kg', 24, 100, 'ok'], ['Milk 500ml', 18, 78, 'ok'], ['Sugar 1kg', 4, 20, 'low'], ['Bread', 2, 10, 'low']].map(([n, left, pct, st], i) =>
-          html`<div class="s-row" style="animation-delay:${0.2 + i * 0.15}s"><div class="row between small"><span>${n}</span><b class="${st === 'low' ? 'low-t' : ''}">${left} left</b></div>
-          <div class="sbar dark ${st}"><i style="width:${pct}%"></i></div></div>`)}
-        <div class="alert-pill">${icon('warn', 16)} 2 items need restocking</div>
-      </div>
-    </div>`,
-  },
-  {
-    bg: 'linear-gradient(160deg,#3b1f5e 0%,#160a2a 72%)', orbs: ['#a78bfa', '#C9A24B'], tag: 'Daily insights',
-    title: html`Know your <em>numbers</em> every evening`, text: 'See sales, M-Pesa vs cash and your top seller, then send the summary to WhatsApp in one tap.',
-    visual: () => html`<div class="stage">
-      <div class="glass float">
-        <span class="small op">Today's sales</span><b class="bigger block">${moneyH(4830)}</b>
-        <div class="bars">${[35, 55, 40, 80, 60, 95, 70].map((h, i) => html`<i style="height:${h}%;animation-delay:${i * 0.08}s;background:${i === 5 ? '#E6C877' : '#ffffff55'}"></i>`)}</div>
-      </div>
-      <div class="bubble float-slow"><b>Daily summary</b><span class="xs block mt6">Sales KSh 4,830 · M-Pesa KSh 3,610 · Cash KSh 1,220</span><span class="xs block">Top seller: Bread</span></div>
-    </div>`,
-  },
+  {tag:'01 / RECEIPTS',title:html`Every sale.<br><em>Recorded.</em>`,text:'Create a receipt in a few taps. Share it on WhatsApp or SMS.',visual:()=>introPreview('A receipt worth sharing',html`<div class="ri-paper"><div class="row gap10">${brandLogo(36)}<div><b class="serif">Mama Njeri Store</b><span class="xs muted block">Digital receipt · Example</span></div></div><div class="ri-rule"></div>${demoRows([['Maize flour × 2',280],['Cooking oil 1L',320]])}<div class="ri-total"><span>Total</span><b>${money(600)}</b></div><div class="ri-receipt-footer">Thank you for your business</div></div><div class="ri-footnote">${icon('wa',16)} Ready to share on WhatsApp</div>`)},
+  {tag:'02 / PAYMENTS',title:html`Keep payments<br><em>clear.</em>`,text:'Show your Till or Paybill. Confirm payment once received.',visual:()=>introPreview('Know what is still due',html`<div class="ri-paper"><span class="ri-overline">CUSTOMER PAYS TO</span><h2 class="ri-shop">Mama Njeri Store</h2><div class="ri-detail"><span>M-Pesa Till</span><b>455484</b></div><div class="ri-total"><span>Amount due</span><b>${money(600)}</b></div><div class="ri-status">${icon('hist',16)} Awaiting payment</div></div><div class="ri-footnote">${icon('check',16)} Confirm only after receiving the money</div>`)},
+  {tag:'03 / STOCK',title:html`Know what needs<br><em>restocking.</em>`,text:'Track quantities as you sell and see what is running low.',visual:()=>introPreview('Your stock, at a glance',html`<div class="ri-paper">${[['Maize flour 2kg',24,false],['Milk 500ml',18,false],['Sugar 1kg',4,true],['Bread',2,true]].map(([name,left,low])=>html`<div class="ri-stock"><span>${name}</span><span class="ri-stock-count${low?' ri-low':''}">${left} left${low?' · Low':''}</span></div>`)}</div><div class="ri-footnote">${icon('box',16)} Two items to add to your restock list</div>`)},
+  {tag:'04 / DAILY SUMMARY',title:html`Close the day<br><em>with clarity.</em>`,text:'Review paid sales, pending payments, and your top seller.',visual:()=>introPreview('A clearer end to your day',html`<div class="ri-paper"><span class="ri-overline">PAID SALES · EXAMPLE</span><b class="ri-revenue">${money(4830)}</b><div class="ri-detail"><span>M-Pesa</span><b>${money(3610)}</b></div><div class="ri-detail"><span>Cash</span><b>${money(1220)}</b></div><div class="ri-detail"><span>Pending · separate</span><b>${money(600)}</b></div><div class="ri-rule"></div><div class="ri-detail"><span>Top seller</span><b>Bread</b></div></div><div class="ri-footnote">${icon('wa',16)} Share your daily summary on WhatsApp</div>`)},
 ];
-
-const orb = (color, i) => html`<span class="orb o${i}" style="background:${color}"></span>`;
-
-function Tour() {
-  const s = SLIDES[U.slide], last = U.slide === SLIDES.length - 1;
-  return html`<div class="screen intro" style="background:${s.bg}">
-    ${s.orbs.map(orb)}<div class="pattern-layer"></div>
-    <div class="stories" aria-hidden="true">${SLIDES.map((_, i) => html`<i class="${i < U.slide ? 'done' : i === U.slide ? 'on' : ''}"></i>`)}</div>
-    <div class="row between intro-top"><div class="row gap10">${brandLogo(38)}<b class="wordmark">Risiti</b></div><button class="chip ghost-w" data-a="back" data-v="welcome">Close</button></div>
-    <div class="visual">${s.visual()}</div>
-    <div class="copy">
-      <span class="eyebrow">${s.tag}</span>
-      <h1 class="hero-h">${s.title}</h1>
-      <p class="lead">${s.text}</p>
-      <div class="row between mt18">
-        <div class="row gap6">${SLIDES.map((_, i) => html`<button class="dot${i === U.slide ? ' on' : ''}" aria-label="Go to slide ${i + 1}" data-a="goSlide" data-v="${i}"></button>`)}</div>
-        <button class="btn light" data-a="next">${last ? 'Get started' : 'Next'} ${icon(last ? 'check' : 'arrow', 18)}</button>
-      </div>
-    </div>
+function Tour(){
+  const s=SLIDES[U.slide],last=U.slide===SLIDES.length-1;
+  return html`<style>
+  .ri-tour{background:linear-gradient(155deg,#245443 0%,#17382D 48%,#0b2119 100%);color:#FFFCF6;padding:24px 24px calc(24px + var(--safe-b));overflow-y:auto;gap:18px}
+  .ri-tour .ri-top{flex:none}.ri-tour .ri-wordmark{font-family:var(--serif);font-size:24px}.ri-tour .ri-close{min-height:44px;padding:0 12px;color:#E8EEE2;font-size:13px;border:1px solid #ffffff26;border-radius:24px}
+  .ri-tour .ri-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;min-height:min-content}.ri-tour .ri-tag{font-size:10px;letter-spacing:2px;font-weight:700;color:#E6C877}.ri-tour .ri-title{font-size:36px;line-height:1.12;margin:12px 0}.ri-tour .ri-title em{color:#E6C877;font-weight:500}.ri-tour .ri-description{font-size:14px;line-height:1.65;color:#dae5dc;max-width:300px}
+  .ri-tour .ri-preview{border:1px solid #E6C87738;border-radius:22px;background:#ffffff08;padding:14px}.ri-tour .ri-preview-head{display:flex;align-items:center;gap:7px;font-size:11px;color:#E8EEE2;margin-bottom:12px}.ri-tour .ri-preview-head small{margin-left:auto;color:#c4d2c8;font-size:10px}.ri-tour .ri-preview-dot{width:5px;height:5px;border-radius:50%;background:#E6C877;flex:none}
+  .ri-tour .ri-paper{background:#FFFCF6;border-radius:13px;padding:18px;color:#17382D}.ri-tour .ri-line,.ri-tour .ri-detail{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;line-height:1.5;margin:9px 0}.ri-tour .ri-rule{border-top:1px dashed #d9d1bf;margin:13px 0}.ri-tour .ri-total{display:flex;align-items:center;justify-content:space-between;border-top:1px dashed #d9d1bf;margin-top:14px;padding-top:12px;font-size:12px}.ri-tour .ri-total b{font-family:var(--serif);font-size:24px}.ri-tour .ri-receipt-footer{font-size:10px;color:#68766c;text-align:center;margin-top:15px}.ri-tour .ri-footnote{display:flex;align-items:center;gap:8px;font-size:11px;line-height:1.5;color:#dae5dc;padding:12px 2px 0}.ri-tour .ri-footnote svg{flex:none}
+  .ri-tour .ri-overline{font-size:9px;letter-spacing:1.4px;color:#68766c;font-weight:700}.ri-tour .ri-shop{font-size:19px;margin:8px 0 14px}.ri-tour .ri-status{display:flex;align-items:center;gap:7px;font-size:11px;color:#805c16;background:#fbf1d8;border-radius:9px;padding:10px;margin-top:14px}.ri-tour .ri-stock{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #eae4d6;font-size:12px}.ri-tour .ri-stock:last-child{border:0}.ri-tour .ri-stock-count{font-size:11px;color:#2d5e4b;white-space:nowrap}.ri-tour .ri-low{color:#805c16;background:#fbf1d8;border-radius:20px;padding:4px 8px}.ri-tour .ri-revenue{display:block;font-family:var(--serif);font-size:32px;margin:7px 0 16px}
+  .ri-tour .ri-bottom{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:4px}.ri-tour .ri-dot{width:24px;height:44px;display:grid;place-items:center}.ri-tour .ri-dot span{width:6px;height:6px;border-radius:8px;background:#ffffff48}.ri-tour .ri-dot[aria-current="step"] span{width:22px;background:#E6C877}.ri-tour .ri-next{min-height:48px;border-radius:14px;padding:0 20px;background:#E6C877;color:#17382D;display:flex;align-items:center;justify-content:center;gap:9px;font-size:14px;font-weight:700}
+  @media(max-height:700px){.ri-tour{padding-top:16px;gap:12px}.ri-tour .ri-body{gap:16px}.ri-tour .ri-title{font-size:29px;margin:8px 0}.ri-tour .ri-paper{padding:14px}.ri-tour .ri-stock{padding:9px 0}.ri-tour .ri-description{font-size:13px}}
+  </style><div class="screen ri-tour">
+    <div class="row between ri-top"><div class="row gap10">${brandLogo(38)}<b class="ri-wordmark">Risiti</b></div><button class="ri-close" data-a="back" data-v="welcome">Close tour</button></div>
+    <div class="ri-body"><div><span class="ri-tag">${s.tag}</span><h1 class="ri-title">${s.title}</h1><p class="ri-description">${s.text}</p></div>${s.visual()}</div>
+    <div class="ri-bottom"><div class="row">${SLIDES.map((_,i)=>html`<button class="ri-dot" aria-label="Go to page ${i+1}" aria-current="${i===U.slide?'step':'false'}" data-a="goSlide" data-v="${i}"><span></span></button>`)}</div><button class="ri-next" data-a="next">${last?'Get started':'Next'} ${icon(last?'check':'arrow',17)}</button></div>
   </div>`;
 }
