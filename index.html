@@ -3,8 +3,20 @@
 <meta name="description" content="Risiti premium workflow prototype. Digital receipts, sample M-Pesa flows and stock management."><meta name="theme-color" content="#17382D"><meta property="og:title" content="Risiti — Smart receipts for Kenyan shops"><meta property="og:description" content="Receipts, payments and stock in one simple app."><meta property="og:type" content="website"><meta property="og:image" content="og-image.png"><meta name="twitter:card" content="summary_large_image"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Risiti">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script></head><body>
-<div id="frame"><div id="app"></div><div id="toast" role="status" aria-live="polite"></div><div id="splash"><div class="seal-ring"><svg viewBox="0 0 152 152" aria-hidden="true"><circle cx="76" cy="76" r="70"/></svg><img class="logo" src="logo.png" width="112" height="112" alt="Risiti"></div><b>Risiti</b><span class="tag-l">Smart receipts</span></div></div>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+#splash{background:linear-gradient(155deg,#245443 0%,#17382D 50%,#0b2119 100%);gap:0;padding:32px 24px;text-align:center}
+#splash .rs-logo{width:84px;height:84px;border-radius:21px;box-shadow:0 8px 24px #07140f33;animation:none;margin-bottom:22px}
+#splash .rs-name{font-family:var(--serif);font-size:34px;line-height:1.15;letter-spacing:-.5px;color:#FFFCF6;animation:none}
+#splash .rs-tagline{font-size:10px;letter-spacing:2.8px;text-transform:uppercase;color:#E6C877;margin-top:10px;animation:none}
+#splash .rs-loader{width:88px;height:3px;background:#E6C87726;border-radius:8px;overflow:hidden;margin-top:32px}
+#splash .rs-loader i{display:block;width:100%;height:100%;background:#E6C877;border-radius:8px;transform-origin:left;animation:rs-loading 1.4s ease-in-out infinite alternate}
+#splash .rs-loading-label{font-size:11px;color:#c6d5c9;margin-top:12px;letter-spacing:.2px}
+@keyframes rs-loading{from{transform:scaleX(.2);opacity:.55}to{transform:scaleX(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){#splash .rs-loader i{animation:none;transform:scaleX(.6)}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script></head><body>
+<div id="frame"><div id="app"></div><div id="toast" role="status" aria-live="polite"></div><div id="splash" role="status" aria-live="polite" aria-label="Loading Risiti"><img class="logo rs-logo" src="logo.png" width="84" height="84" alt=""><b class="rs-name">Risiti</b><span class="rs-tagline">Smart receipts</span><div class="rs-loader" aria-hidden="true"><i></i></div><span class="rs-loading-label">Opening your workspace…</span></div></div>
 <input type="file" id="logo-input" accept="image/*" hidden>
 <script src="js/config.js"></script>
 <script src="js/icons.js"></script>
