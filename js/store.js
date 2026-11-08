@@ -40,7 +40,16 @@ function setupTasks(){return [
 const showChecklist=()=>!S.demo&&!S.flags.dismissed&&setupTasks().some(t=>!t.done);
 function customers(){const map={};liveSales().filter(s=>s.phone).forEach(s=>{const c=map[s.phone]=map[s.phone]||{phone:s.phone,visits:0,spent:0,last:0};c.visits++;c.spent+=saleTotals(s).total;c.last=Math.max(c.last,s.ts)});return Object.values(map).sort((a,b)=>b.spent-a.spent)}
 function daySummary(day=Date.now()){const list=liveSales().filter(s=>sameDay(s.ts,day)),paid=list.filter(s=>s.status==='paid'),pending=list.filter(s=>s.status==='pending'),qty={};paid.forEach(s=>s.items.forEach(i=>qty[i.n]=(qty[i.n]||0)+i.q));const top=Object.entries(qty).sort((a,b)=>b[1]-a[1])[0];return {day,count:list.length,revenue:sumOf(paid),mpesa:sumOf(paid.filter(s=>s.pay==='mpesa')),cash:sumOf(paid.filter(s=>s.pay==='cash')),pending:sumOf(pending),pendingCount:pending.length,top:top?{name:top[0],qty:top[1]}:null,low:lowStock()}}
-function summaryText(day=Date.now()){const d=daySummary(day),lines=[`*${S.shop.name} - Daily summary*`,longDate(day),'',`Paid sales: *${money(d.revenue)}*`,`${d.count} receipt(s), including pending`,`M-Pesa: ${money(d.mpesa)}`,`Cash: ${money(d.cash)}`];if(d.pendingCount)lines.push(`Pending: ${money(d.pending)} (${d.pendingCount})`);if(d.top)lines.push('',`Top seller: ${d.top.name} (${d.top.qty} sold)`);if(d.low.length)lines.push('','Restock soon:',...d.low.map(p=>`- ${p.n}: ${p.stock<=0?'OUT':p.stock+' left'}`));return lines.concat(['','Sent with Risiti']).join('\n')}
+function summaryText(day=Date.now()){
+  const d=daySummary(day);
+  const paidCount=liveSales().filter(s=>sameDay(s.ts,day)&&s.status==='paid').length;
+  const divider='────────────────────';
+  const lines=['*RISITI | DAILY SUMMARY*',S.shop.name||'My shop',longDate(day),divider,'','*PAID SALES*',money(d.revenue),`${paidCount} paid receipt${paidCount===1?'':'s'}`,'','*PAYMENT BREAKDOWN*',`M-Pesa: ${money(d.mpesa)}`,`Cash: ${money(d.cash)}`];
+  if(d.pendingCount)lines.push('','*AWAITING PAYMENT*',`${money(d.pending)} · ${d.pendingCount} receipt${d.pendingCount===1?'':'s'}`,'Not included in paid sales.');
+  if(d.top)lines.push('','*TOP SELLER*',`${d.top.name} · ${d.top.qty} sold`);
+  if(d.low.length)lines.push('','*RESTOCK REMINDER*',...d.low.map(p=>`• ${p.n} — ${p.stock<=0?'OUT OF STOCK':p.stock+' left'}`));
+  return lines.concat(['',divider,'*Risiti*','Smart receipts. Clear business.']).join('\n');
+}
 function applyStock(sale,dir){sale.items.forEach(i=>{const p=findProduct(i.n);if(p&&p.stock!=null)p.stock=Math.max(0,p.stock+dir*i.q)})}
 function validateStock(items){const counts={};items.forEach(i=>counts[i.n.toLowerCase()]=(counts[i.n.toLowerCase()]||0)+i.q);for(const [name,q]of Object.entries(counts)){const p=findProduct(name);if(p&&p.stock!=null&&q>p.stock)return `Only ${p.stock} ${p.n} in stock`}return ''}
 function recordSale(draft,status,phone){const sub=saleTotals({items:draft.items,disc:0}).sub,ts=Date.now(),sale={id:nextReceiptId(ts),items:draft.items.map(i=>({...i})),pay:draft.pay,phone:draft.phone?phone:'',disc:Math.min(+draft.disc||0,sub),note:draft.note.trim(),vat:S.vat?1:0,ts,ref:'',status:status==='draft'?'draft':draft.pay==='cash'?'paid':'pending'};S.sales.unshift(sale);if(sale.status!=='draft')applyStock(sale,-1);saveState();return sale}
