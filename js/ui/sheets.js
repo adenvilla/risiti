@@ -56,22 +56,22 @@ function ReceiptSheet() {
   return html`${sheetHeader('Receipt')}
   <div class="rh"><div class="pattern-layer"></div><i class="weave"></i>${shopLogo(54, 16)}<h2 class="mt10 white-t">${S.shop.name || 'My shop'}</h2><span class="xs op mt2">Official receipt${S.shop.loc ? ' · ' + S.shop.loc : ''}</span></div>
   <div class="seal ${s.status}">${icon(s.status === 'paid' ? 'check' : s.status === 'pending' ? 'hist' : 'doc', 22)}</div>
-  <div class="receipt-body"><p class="seal-label ${s.status}">${SEAL_TEXT[s.status]}</p>
+  <div class="receipt-body"><p class="seal-label ${s.status}" style="${s.status === 'voided' ? 'color:var(--red);' : ''}">${SEAL_TEXT[s.status]}</p>
     <div class="row between rule"><div><div class="xs faint">Receipt #</div><b class="small">${s.id}</b></div><div class="right"><div class="xs faint">Date</div><b class="small">${dayLabel(s.ts)}, ${timeLabel(s.ts)}</b></div></div>
     ${s.items.map((i) => html`<div class="row between mb10"><div><b>${i.n}</b><div class="xs faint">${i.q} × ${money(i.p)}</div></div><b class="serif">${money(i.q * i.p)}</b></div>`)}
     ${totalsBlock(s)}
     <div class="row wrap gap8 mt14"><span class="chip sm static">${icon(s.pay === 'cash' ? 'cash' : 'phone', 14)} Paid via: ${s.pay === 'cash' ? 'Cash' : 'M-Pesa'}</span>
       ${s.phone ? html`<span class="chip sm static">${formatPhone(s.phone)}</span>` : ''}${s.ref ? html`<span class="chip sm static ok-chip">M-Pesa ref ${s.ref}</span>` : ''}</div>
     ${s.note ? html`<p class="small muted mt12">Note: ${s.note}</p>` : ''}
-    ${s.status === 'voided' ? html`<div class="stamp" style="background:#B3261E;color:#fff;">VOIDED</div>${s.voidReason ? html`<p class="small muted mt12">Reason: ${s.voidReason}</p>` : ''}` : s.status === 'paid' ? html`<div class="stamp">PAID</div>` : ''}
+    ${s.status === 'voided' ? html`<div class="stamp" style="border-color:var(--red);color:var(--red);">VOIDED</div>${s.voidReason ? html`<p class="small muted mt12">Reason: ${s.voidReason}</p>` : ''}` : s.status === 'paid' ? html`<div class="stamp">PAID</div>` : ''}
     <p class="small bold center-t mt16 serif">Thank you for your business</p><p class="xs faint center-t">Powered by Risiti</p></div>
   ${U.showQr ? html`<div class="card center-t mt12"><div class="qr-box">${qrSvg(`RISITI ${s.id} | ${S.shop.name} | ${money(t.total)}${S.shop.till ? ` | ${S.shop.kind} ${S.shop.till}` : ''}`)}</div><p class="xs faint mt8">Scan to view receipt details</p></div>` : ''}
   <p class="bold my12 mt18 serif lg">Share receipt</p>
   <div class="share">${[['wa', 'WhatsApp', '#DCF8C6', '#25D366'], ['sms', 'SMS', '#E8F4FD', '#3B82F6'], ['copy', 'Copy', '#EEE9DB', '#6B7280'], ['qr', 'QR code', '#F3E8FF', '#7C3AED']].map(([id, name, bg, fg]) =>
     html`<button data-a="share" data-v="${id}"><span style="background:${bg}">${icon(id, 22, fg)}</span>${name}</button>`)}</div>
-  ${s.status === 'pending' ? html`${pendingBlock}<button class="btn ghost full mt10" data-a="cancelReceipt">${icon('x', 18)} Cancel receipt</button>` : ''}
-  ${s.status === 'draft' ? html`<button class="btn full mt18" data-a="finalise">${icon('send', 18)} Finalise &amp; send</button><button class="btn ghost full mt10" data-a="cancelReceipt">${icon('x', 18)} Cancel receipt</button>` : ''}
-  ${s.status === 'paid' ? html`<button class="btn ghost full mt18" data-a="voidReceipt">${icon('trash', 18)} Void &amp; correct</button>` : ''}
+  ${s.status === 'pending' ? html`${pendingBlock}<button class="btn quiet-danger sm" data-a="cancelReceipt">${icon('x', 15)} Cancel receipt</button>` : ''}
+  ${s.status === 'draft' ? html`<button class="btn full mt18" data-a="finalise">${icon('send', 18)} Finalise &amp; send</button><button class="btn quiet-danger sm" data-a="cancelReceipt">${icon('x', 15)} Cancel receipt</button>` : ''}
+  ${s.status === 'paid' ? html`<button class="btn quiet-danger sm" data-a="voidReceipt">${icon('undo', 15)} Void &amp; correct</button>` : ''}
   <button class="btn ghost full mt12" data-a="close">Done</button>`;
 }
 
