@@ -1,9 +1,11 @@
-/** Risiti enrollment: welcome, demo phone verification, shop setup. */
+/** Risiti enrollment: welcome, demo phone verification, guided shop setup, payment setup, and first sale. */
 const WELCOME_POINTS = [
   ['wa', 'Receipts worth sharing', 'Send receipts on WhatsApp or SMS'],
   ['phone', 'Payments kept clear', 'Track paid and pending sales'],
   ['box', 'Stock at a glance', 'Know what needs restocking'],
 ];
+const SETUP_STEPS=['Phone','Shop details','Ready to sell'];
+const setupProgress=step=>html`<div class="setup-progress" aria-label="Setup progress">${SETUP_STEPS.map((label,i)=>html`<div class="setup-step${i<step?' done':i===step?' on':''}"><span>${i<step?icon('check',12):i+1}</span><small>${label}</small></div>`)}</div>`;
 const WelcomeScreen = () => html`<div class="screen welcome rw-welcome">
   <style>
   .rw-welcome{padding:24px 24px calc(24px + var(--safe-b));background:linear-gradient(155deg,#245443 0%,#17382D 50%,#0b2119 100%);color:#FFFCF6;overflow-y:auto;gap:22px}
@@ -19,7 +21,7 @@ const WelcomeScreen = () => html`<div class="screen welcome rw-welcome">
     <div class="rw-preview"><div class="rw-preview-label"><span>A little clarity for every sale</span><span>Example</span></div><div class="rw-receipt"><b class="rw-shop">Mama Njeri Store</b><p class="rw-caption">Digital receipt · Example</p><div class="rw-rule"></div><div class="rw-line"><span>Maize flour × 2</span><b>${money(280)}</b></div><div class="rw-line"><span>Cooking oil 1L</span><b>${money(320)}</b></div><div class="rw-rule"></div><div class="rw-total"><span>Total</span><b>${money(600)}</b></div></div><div class="rw-share">${icon('wa',15)} Ready to share on WhatsApp</div></div>
     <div class="rw-benefits">${WELCOME_POINTS.map(([ic,title,sub])=>html`<div class="rw-benefit"><span class="rw-benefit-icon">${icon(ic,16)}</span><div><b>${title}</b><small>${sub}</small></div></div>`)}</div>
   </div>
-  <div class="rw-footer"><button class="rw-start" data-a="start">Get started ${icon('arrow',18)}</button><div class="rw-links"><button data-a="tour">See how it works</button><button data-a="demo">Try demo shop</button></div><p class="rw-note">Demo shop uses sample data.</p></div>
+  <div class="rw-footer"><button class="rw-start" data-a="start">Get started ${icon('arrow',18)}</button><div class="rw-links"><button data-a="tour">See how it works</button><button data-a="demo">Try demo shop</button></div><p class="rw-note">Demo shop uses sample data. You can start your real shop later.</p></div>
 </div>`;
 
 const otpBoxes = () => Array.from({ length: OTP_LENGTH }, (_, i) =>
@@ -29,7 +31,7 @@ function AuthScreen() {
   const sent = U.otpSent;
   return html`<div class="screen bg-soft">
     <div class="hero-top compact"><div class="pattern-layer"></div><button class="iconbtn abs-tl" aria-label="Back" data-a="back" data-v="welcome"><span class="flip">${icon('chev', 18)}</span></button>${brandLogo(72)}<h1 class="brand">Risiti</h1></div>
-    <div class="scroll pt0"><div class="card pad24 rise">
+    <div class="scroll pt0"><div class="card pad24 rise">${setupProgress(sent?1:0)}
       ${sent ? html`
         <h2 class="h-green">Enter the 6-digit code</h2>
         <p class="muted small mt6 lh">Sent to <b class="ink">+254 ${U.phone}</b> · <button class="link green bold" data-a="editNumber">Change</button></p>
@@ -48,13 +50,32 @@ function AuthScreen() {
 }
 
 function SetupShop() {
-  const { name, cat } = U.setup, type = SHOP_TYPES[cat];
+  const { name, cat, loc } = U.setup, type = SHOP_TYPES[cat];
   return html`<div class="screen"><div class="scroll pb140">
-    <p class="step-chip">${icon('check', 14)} Phone verified · last step</p>
+    ${setupProgress(1)}
     <h1 class="mt12">Name your shop</h1><p class="muted small mt4 lh">This appears at the top of every receipt.</p>
-    <div class="preview"><div class="pattern-layer"></div>${brandLogo(46)}<div><b id="preview-name" class="block">${name.trim() || 'Your shop name'}</b><span class="xs op block">Official receipt · ${cat}</span></div></div>
-    ${sectionLabel('Shop name')}<div class="inp">${icon('shop', 18, '#9CA3AF')}<input data-i="U.setup.name" data-focus="1" data-enter="shopFinish" data-live="preview-name" placeholder="e.g. Mama Njeri Store" value="${name}" aria-label="Shop name" maxlength="40"></div>${errorBox()}
+    <div class="preview"><div class="pattern-layer"></div>${brandLogo(46)}<div><b id="preview-name" class="block">${name.trim() || 'Your shop name'}</b><span class="xs op block">Official receipt · ${cat}${loc?` · ${loc}`:''}</span></div></div>
+    ${sectionLabel('Shop name')}<div class="inp">${icon('shop', 18, '#9CA3AF')}<input data-i="U.setup.name" data-focus="1" data-live="preview-name" placeholder="e.g. Mama Njeri Store" value="${name}" aria-label="Shop name" maxlength="40"></div>${errorBox()}
     ${sectionLabel('What do you sell?')}<div class="cat-grid">${SHOP_CATEGORIES.map((c) => html`<button class="cat${cat === c ? ' on' : ''}" data-a="pickCategory" data-v="${c}"><span>${SHOP_TYPES[c].emoji}</span>${c}</button>`)}</div>
+    ${sectionLabel('Shop location')}<div class="inp">${icon('pin', 18, '#9CA3AF')}<input data-i="U.setup.loc" placeholder="Optional — e.g. Kiambu" value="${loc||''}" aria-label="Shop location" maxlength="50"></div>
     <p class="xs muted mt14 lh">We'll add ${type.starter.length} popular items (${type.starter.slice(0, 3).map(([n]) => n).join(', ')}…) so you can sell right away. Change them anytime.</p>
-  </div><div class="ft"><button class="btn foil full" data-a="shopFinish"><span>${icon('bolt', 18)} Start selling</span></button></div></div>`;
+  </div><div class="ft"><button class="btn foil full" data-a="shopContinue"><span>${icon('bolt', 18)} Continue</span></button></div></div>`;
+}
+
+function PaymentSetup(){
+  const h=U.shopEdit||{};
+  return html`<div class="screen"><div class="scroll pb140">${setupProgress(2)}
+  <h1 class="mt12">How can customers pay you?</h1><p class="muted small mt4 lh">Add your Till or Paybill now, or skip and add it later in Settings.</p>
+  ${sectionLabel('Payment type')}<div class="cat-grid">${['Till','Paybill'].map(kind=>html`<button class="cat${h.kind===kind?' on':''}" data-a="shopKind" data-v="${kind}"><span>${kind==='Till'?'🏪':'🏦'}</span>${kind}</button>`)}</div>
+  ${sectionLabel(h.kind==='Paybill'?'Paybill number':'Till number')}<div class="inp">${icon('cash',18,'#9CA3AF')}<input data-i="U.shopEdit.till" data-n="1" inputmode="numeric" placeholder="e.g. 455484" value="${h.till||''}" aria-label="Till or Paybill number" maxlength="7"></div>
+  <p class="xs muted mt14">This helps customers pay you easily. You can change it anytime in Settings.</p>
+  </div><div class="ft"><div class="row gap10"><button class="btn ghost full" data-a="skipPayment">Skip for now</button><button class="btn foil full" data-a="finishSetup"><span>${icon('check',18)} Finish setup</span></button></div></div></div>`;
+}
+
+function FirstSaleGuide(){
+  return html`<div class="screen"><div class="scroll pb140">${setupProgress(3)}
+  <h1 class="mt12">You're ready to sell</h1><p class="muted small mt4 lh">Your shop is set up. Make your first receipt in under a minute.</p>
+  <div class="card pad20"><b class="block">Make your first sale</b><p class="small muted mt6 lh">Choose an item, add the customer phone number if you want, then send or save the receipt.</p></div>
+  <div class="card pad20 mt14"><b class="block">Using demo data?</b><p class="small muted mt6 lh">You can explore sample sales first. When you are ready, reset to a real, empty shop.</p><button class="btn sm mt12" data-a="resetDemo">Start with an empty shop</button></div>
+  </div><div class="ft"><button class="btn foil full" data-a="newSale"><span>${icon('plus',18)} Make your first sale</span></button></div></div>`;
 }
