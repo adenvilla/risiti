@@ -1,0 +1,14 @@
+{
+  "name": "Risiti — Smart receipts",
+  "short_name": "Risiti",
+  "description": "Premium receipts and stock prototype. Demo payments only.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#17382D",
+  "theme_color": "#17382D",
+  "icons": [
+    {"src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "assets/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}
