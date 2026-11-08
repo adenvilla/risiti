@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+
+# Build output
+build/
+dist/
+
+# Editor
+.vscode/
+.idea/
