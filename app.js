@@ -1,0 +1,120 @@
+/** Risiti - rendering, event wiring and timers. Loaded last. */
+
+const view = { scr: '', tab: '', sheet: '', focus: '' };
+let slideTimer = null;
+
+function toast(message) {
+  const t = $('#toast'); t.textContent = message; t.classList.add('on');
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('on'), 2400);
+}
+function tickResend() {
+  const b = $('#resend'); if (b) b.textContent = U.cd > 0 ? 'Resend in 0:' + String(U.cd).padStart(2, '0') : 'Resend code';
+}
+
+/** Animates every `.count[data-to]` figure from 0 to its value (skipped for reduced motion). */
+function animateCounts() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.count[data-to]').forEach((el) => {
+    const to = +el.dataset.to, t0 = performance.now();
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / COUNT_UP_MS), eased = 1 - Math.pow(1 - k, 3);
+      el.innerHTML = moneyH(to * eased).s;
+      if (k < 1 && el.isConnected) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+/** Re-renders the whole screen, preserving scroll position when staying on the same view. */
+function render() {
+  const app = $('#app'), body = app.querySelector('.scroll'), sheet = app.querySelector('.sheet');
+  const bodyTop = body ? body.scrollTop : 0, sheetTop = sheet ? sheet.scrollTop : 0;
+  const screenChanged = U.scr !== view.scr, tabChanged = U.tab !== view.tab;
+
+  app.innerHTML = SCREENS[U.scr]().s + (U.sheet ? Sheet().s : '');
+  U.sheetIn = false;
+
+  const newBody = app.querySelector('.scroll'), newSheet = app.querySelector('.sheet');
+  if (screenChanged) app.firstElementChild.classList.add('ani');
+  else if (tabChanged && U.scr === 'main' && newBody) newBody.style.animation = 'fade .35s';
+  else if (newBody) newBody.scrollTop = bodyTop;
+  if (newSheet) newSheet.scrollTop = U.sheet === view.sheet ? sheetTop : 0;
+  if (U.scr === 'main' && U.tab === 'home' && !U.sheet && (screenChanged || tabChanged)) animateCounts();
+
+  /* Move focus to the primary input whenever a new form appears (or an error needs fixing). */
+  const focusKey = [U.scr, U.otpSent, U.sheet].join();
+  if (focusKey !== view.focus || U.err) { const f = app.querySelector('[data-focus="1"]'); if (f) f.focus({ preventScroll: true }); }
+  Object.assign(view, { scr: U.scr, tab: U.tab, sheet: U.sheet, focus: focusKey });
+
+  clearTimeout(slideTimer);
+  if (U.scr === 'tour' && U.slide < SLIDES.length - 1) slideTimer = setTimeout(Actions.next, SLIDE_MS);
+}
+
+/* ---------- Events (single delegated listeners) ---------- */
+const root = $('#app');
+root.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-a]');
+  if (el && Actions[el.dataset.a]) Actions[el.dataset.a](el, e);
+});
+
+/** Two-way binding for inputs: data-i="S.shop.name" or "U.draft.qty"; data-n strips non-digits. */
+root.addEventListener('input', (e) => {
+  const t = e.target, path = t.dataset.i;
+  if (!path) return;
+  if (t.dataset.n) t.value = t.value.replace(/\D/g, '');
+  const keys = path.split('.'), owner = keys.shift() === 'S' ? S : U, last = keys.pop();
+  let obj = owner; keys.forEach((k) => (obj = obj[k]));
+  obj[last] = t.value;
+  if (path.startsWith('S.')) saveState();
+  if (t.dataset.live) $('#' + t.dataset.live).textContent = t.value.trim() || 'Your shop name';
+  if (path === 'U.query') $('#history-list').innerHTML = HistoryList().s;
+  else if (path === 'U.custQuery') $('#customer-list').innerHTML = CustomerList().s;
+  else if (path === 'U.draft.disc') $('#sale-totals').innerHTML = totalsBlock({ items: U.draft.items, disc: U.draft.disc, vat: S.vat }).s;
+  else if (path === 'U.otp') {
+    stopAutofill(); drawOtp();
+    if (U.otp.length === OTP_LENGTH) setTimeout(Actions.verify, 250);
+  }
+});
+
+/** Logo upload: centre-crop to a 160px square JPEG so it stays small in localStorage. */
+$('#logo-input').addEventListener('change', (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas'), size = 160, side = Math.min(img.width, img.height);
+      c.width = c.height = size;
+      c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+      S.logo = c.toDataURL('image/jpeg', 0.85); saveState(); render(); toast('Logo updated');
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file); e.target.value = '';
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && U.sheet) { Actions.close(); return; }
+  const action = e.key === 'Enter' && e.target.dataset && e.target.dataset.enter;
+  if (action) { e.preventDefault(); Actions[action](); }
+});
+
+let touchX = 0;
+root.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+root.addEventListener('touchend', (e) => {
+  if (U.scr !== 'tour') return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (dx < -50 && U.slide < SLIDES.length - 1) { U.slide++; render(); } else if (dx > 50 && U.slide > 0) { U.slide--; render(); }
+}, { passive: true });
+
+setInterval(() => { if (U.scr === 'auth' && U.otpSent && U.cd > 0) { U.cd--; tickResend(); } }, 1000);
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; });
+addEventListener('online', () => { if (U.scr === 'main' && U.tab === 'home') render(); toast('Back online'); });
+addEventListener('offline', () => { if (U.scr === 'main' && U.tab === 'home') render(); toast('You are offline — sales still save'); });
+if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+render();
+/* Branded splash: the gold ring draws itself, then the splash fades out. */
+setTimeout(() => { const s = $('#splash'); if (s) { s.classList.add('out'); setTimeout(() => s.remove(), 500); } }, SPLASH_MS);
