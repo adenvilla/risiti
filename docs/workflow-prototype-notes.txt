@@ -1,0 +1,13 @@
+RISITI — WORKFLOW PROTOTYPE
+
+Separate prototype based on the direction discussed, not a merge of the earlier redesigned ZIP. The available uploaded HTML was an older version.
+
+Open the HTML in a modern browser. All data is stored only in that browser under a separate key. No backend or payment API is connected.
+
+Included: amount keypad, product checkout and search, cash recording, pending M-Pesa with manual reference confirmation, credit ledger and repayments, WhatsApp receipt/reminder drafts, item-based partial/full refunds, optional restocking, unpaid-sale corrections with linked replacement records, unpaid-sale voids, stock corrections with reason log, English/Swahili core navigation, printable receipts and browser Save PDF, JSON backup export and sales CSV.
+
+Boundaries: credit payments are pooled per customer, not allocated to invoices. Corrections/voids/refunds that would overrun the remaining balance are blocked. Paid credit reimbursements require a future dedicated workflow. No payment verification, OTP, staff roles, barcode scanner, cloud sync, eTIMS, JSON import, or complete Swahili translation. The home summary is a sale-date cohort, not a cashbook: repayments are in the ledger, not included in home revenue. No automatic VAT.
+
+Tested in Chromium at 390x844: quick cash sale, full refund, product credit sale, partial repayment, stock count correction and language switch. No JavaScript page errors in that scenario. Other paths, mobile Safari, low-end devices and persistence failure handling need further QA.
+
+Do not use for real financial records yet.

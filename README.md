@@ -1,56 +1,49 @@
-# Risiti
+# Risiti — premium prototype
 
-**Risiti** is a workflow prototype for a mobile-first shop tool: digital receipts, M-Pesa-style payment tracking, customer credit, stock control and daily sales visibility for Kenyan small businesses.
+Risiti is a mobile-first receipts and stock prototype for Kenyan small businesses. The main app preserves the emerald, ivory and gold design.
 
-This repository currently contains the project documentation and structure. The interactive prototype HTML will be added in a follow-up commit.
+## Upload status
 
-## Current workflow
+The premium HTML shell, JavaScript modules, split stylesheets, manifest and service worker have been committed. The five PNG brand assets, standalone prototypes, original-source archives and screenshots are still pending transfer. This README must not be taken as confirmation that the full restoration archive is uploaded or that a live site exists.
 
-- **Quick sale:** enter an amount on a keypad and check out.
-- **Product sale:** search products, add quantities, and check out.
-- **Payment methods:** cash, pending M-Pesa, or customer credit.
-- **M-Pesa:** sales start as pending and require manual confirmation with a reference. No payment API is connected.
-- **Credit:** customer name and phone are required. A customer ledger tracks credit issued and repayments.
-- **Refunds:** item-based, with optional restocking and a required reason.
-- **Corrections:** an unpaid sale can be corrected through a linked replacement sale; the original remains in history.
-- **Voids:** unpaid sales can be voided with a reason and stock restoration.
-- **Stock:** sales and refunds adjust tracked stock; stock corrections require a reason and audit entry.
-- **Language:** limited English/Swahili toggle for core navigation and checkout labels only.
-- **Exports:** sales CSV and JSON backup.
-- **Receipts:** printable or browser Save-as-PDF receipt, WhatsApp draft, and copy-to-clipboard.
+## Premium app features
 
-## Important boundaries
+- Welcome tour, simulated phone OTP and shop setup.
+- Starter products, cart quantities, discounts, notes and optional customer phone.
+- Cash receipts, pending M-Pesa and explicitly simulated STK confirmation.
+- Draft receipts and finalisation.
+- Receipt sharing by WhatsApp/SMS/copy, and QR when the optional library is available.
+- Product stock tracking, low-stock indicators and adjustments.
+- Receipt search, customer history, daily summary and CSV export.
+- Shop logo upload, Till/Paybill details and a demo 16% VAT setting.
 
-This is a prototype, not a production financial system.
+Credit, refunds, repayment allocation and linked corrections belong to separate uploaded experimental prototypes. They have NOT been merged into the premium app. Existing docs/prototype-notes.md describes earlier experimental work, not feature parity with the premium source.
 
-- No real OTP authentication.
-- No Safaricom Daraja integration or payment verification.
-- No cloud database, account system, multi-device sync, or staff permissions.
-- No KRA eTIMS integration.
-- No barcode scanning.
-- Credit repayments are pooled by customer rather than allocated to individual invoices.
-- The Home total reflects paid sales created today, net of refunds against those sales; it is not a complete cashbook.
+## Run locally
 
-## Roadmap
+After all required assets are present:
 
-1. Credit allocation to individual sales and statements.
-2. Faster checkout and one-tap quick sale.
-3. M-Pesa verification workflow and payment status controls.
-4. Cashbook-style daily, weekly and monthly reporting.
-5. Stock-take workflow and product cost/profit tracking.
-6. Backend, authentication, encrypted storage and role-based access.
-7. Safaricom Daraja integration and KRA eTIMS support where required.
-
-## Repository structure
-
-```text
-README.md
- docs/
-   prototype-notes.md
- .gitignore
- LICENSE
+```sh
+python3 -m http.server 8080
 ```
 
-## Status
+Open http://localhost:8080. A GitHub repository URL displays source, not a live app. No GitHub Pages or other deployment has been configured by these uploads.
 
-Prototype only. Do not use for real financial records, tax reporting, or production payments.
+## Verification
+
+```sh
+python3 tests/verify_package.py
+```
+
+This reports missing files, PNG header/dimension mismatches, broken local shell/import references and JavaScript syntax errors when Node.js is available. It is not a full browser or financial audit.
+
+## Boundaries
+
+- OTP and STK are simulations. No authentication or real payment API is connected.
+- Storage and auto-backup are browser-local, not cloud backups.
+- Home sales aggregates include pending sales; the summary separately calculates paid revenue. Neither is a complete cashbook.
+- English remains the main app default. Limited Swahili stays in the separate prototypes.
+- Fonts and QR generation have optional external dependencies.
+- No staff permissions, database sync, barcode scanner or eTIMS integration.
+
+Do not use for real financial records or live payments. See docs/RESTORATION.md and docs/QA.md.
