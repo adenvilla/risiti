@@ -6,14 +6,14 @@ Supporting configuration, SVG icons, utilities, state, action handlers, renderer
 
 Defensive fixes include aggregated checkout stock validation, one-time draft finalisation, demo OTP validation, timer cancellation, correct handling of array-valued search renderers, the missing Till/Paybill action, scoped cache cleanup and storage-failure messaging. A renderer typo introduced during GitHub transfer was corrected in a subsequent commit.
 
-## Remaining transfer
+## Cleanup and uploaded image paths
 
-- assets/logo.png, assets/favicon-32.png, assets/apple-touch-icon.png, assets/icon-192.png, assets/og-image.png.
-- Original, Workflow and Operations standalone HTML prototypes.
-- Uploaded-source archival copies, image originals and preview screenshots.
+The backup/pre-cleanup branch preserves the repository before twelve loose root JavaScript/CSS files were removed. Active scripts remain in js/ and js/ui/; active styles remain in css/. The uploaded ZIP remains at the root as a backup, not an app dependency.
 
-The supplied images arrived as JPEG. Proper PNG re-encoding preserves their dimensions but cannot recover any information already lost to JPEG compression. The connector's native file-writing tools accept text; binary image transfer is not yet completed. No placeholder logo is being substituted.
+The five uploaded image filenames are present at the root. The HTML shell, shared logo component, manifest, service-worker shell list and package verifier now intentionally use those root locations rather than assets/. This update changes text references only: it does not move or re-encode the binaries, certify their formats or claim successful browser/offline tests. Run tests/verify_package.py to check actual PNG signatures and dimensions.
+
+prototypes/operations.html is present. Original and Workflow standalone prototypes, additional archival material and screenshots are not asserted fully transferred by this update.
 
 ## Scope
 
-The premium app and experimental prototypes are separate versions with separate storage keys. Preserving source is not the same as merging and testing credit/refund features. No automatic migration is implemented. Backend/payment integration and deployment remain out of scope for this restoration.
+The premium app and experimental prototypes are separate versions with separate storage keys. Preserving source is not the same as merging and testing credit/refund features. No automatic migration is implemented. Backend/payment integration and deployment remain out of scope. See the root README for local serving and verification commands.

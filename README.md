@@ -1,49 +1,42 @@
 # Risiti — premium prototype
 
-Risiti is a mobile-first receipts and stock prototype for Kenyan small businesses. The main app preserves the emerald, ivory and gold design.
+Mobile-first receipts and stock prototype for Kenyan small businesses. The emerald, ivory and gold design is unchanged. This is a demo, not production accounting or payment software.
 
-## Upload status
+## Repository layout
 
-The premium HTML shell, JavaScript modules, split stylesheets, manifest and service worker have been committed. The five PNG brand assets, standalone prototypes, original-source archives and screenshots are still pending transfer. This README must not be taken as confirmation that the full restoration archive is uploaded or that a live site exists.
-
-## Premium app features
-
-- Welcome tour, simulated phone OTP and shop setup.
-- Starter products, cart quantities, discounts, notes and optional customer phone.
-- Cash receipts, pending M-Pesa and explicitly simulated STK confirmation.
-- Draft receipts and finalisation.
-- Receipt sharing by WhatsApp/SMS/copy, and QR when the optional library is available.
-- Product stock tracking, low-stock indicators and adjustments.
-- Receipt search, customer history, daily summary and CSV export.
-- Shop logo upload, Till/Paybill details and a demo 16% VAT setting.
-
-Credit, refunds, repayment allocation and linked corrections belong to separate uploaded experimental prototypes. They have NOT been merged into the premium app. Existing docs/prototype-notes.md describes earlier experimental work, not feature parity with the premium source.
+- index.html: main app entry point.
+- js/: active configuration, utilities, state, actions and renderer.
+- js/ui/: premium screen and component modules.
+- css/: stylesheets, loaded in their original order.
+- logo.png, favicon-32.png, apple-touch-icon.png, icon-192.png, og-image.png: uploaded images at the repository root; app paths intentionally match these locations.
+- manifest.webmanifest and sw.js: install metadata and same-origin offline shell.
+- prototypes/operations.html: separate experimental prototype; not merged into the premium app.
+- docs/ and tests/: development notes and checks.
+- risiti-repo 3.zip: retained uploaded backup; not loaded by the app.
+- backup/pre-cleanup branch: snapshot preserving the loose original source files removed during cleanup.
 
 ## Run locally
 
-After all required assets are present:
+Download and extract the repository, open a terminal in its root and run:
 
 ```sh
 python3 -m http.server 8080
 ```
 
-Open http://localhost:8080. A GitHub repository URL displays source, not a live app. No GitHub Pages or other deployment has been configured by these uploads.
+Open http://localhost:8080 in a browser. Serve the extracted files, not the ZIP itself. A GitHub repository page shows source; this change does not publish a live site or configure hosting.
 
-## Verification
+## Check the package
 
 ```sh
 python3 tests/verify_package.py
 ```
 
-This reports missing files, PNG header/dimension mismatches, broken local shell/import references and JavaScript syntax errors when Node.js is available. It is not a full browser or financial audit.
+The check verifies required files, PNG signatures and dimensions, local HTML/CSS paths, manifest icons, offline-shell paths and JavaScript syntax when Node.js is installed. A .png extension alone does not prove that an uploaded image is PNG. Failures must be fixed before claiming installability. Browser and offline tests are still required; this path update does not claim they passed.
 
-## Boundaries
+If you previously opened a hosted version, reload after the updated service worker installs. The cache version was changed so the previous Risiti shell can be replaced. External fonts and QR generation are not included in the offline shell.
 
-- OTP and STK are simulations. No authentication or real payment API is connected.
-- Storage and auto-backup are browser-local, not cloud backups.
-- Home sales aggregates include pending sales; the summary separately calculates paid revenue. Neither is a complete cashbook.
-- English remains the main app default. Limited Swahili stays in the separate prototypes.
-- Fonts and QR generation have optional external dependencies.
-- No staff permissions, database sync, barcode scanner or eTIMS integration.
+## Use and limitations
 
-Do not use for real financial records or live payments. See docs/RESTORATION.md and docs/QA.md.
+The main app offers demo onboarding, shop setup, products and stock, cart sales, drafts, receipts, sharing, search, customer history, summaries and CSV export. OTP and STK are simulations; no real authentication or payment backend is connected. Shop data and backup settings are browser-local, not cloud storage. Export important demo records before clearing browser storage. Credit/refund experiments remain separate.
+
+Do not use this prototype for live payments or authoritative financial records. Image binaries have not been re-encoded by this text-only path update.

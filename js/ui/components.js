@@ -1,6 +1,6 @@
 /** Risiti - small reusable view fragments. Every function returns Raw HTML via html``. */
 
-const brandLogo = (size = 56) => html`<img class="logo" src="assets/logo.png" width="${size}" height="${size}" alt="Risiti" style="border-radius:${Math.round(size * 0.24)}px">`;
+const brandLogo = (size = 56) => html`<img class="logo" src="logo.png" width="${size}" height="${size}" alt="Risiti" style="border-radius:${Math.round(size * 0.24)}px">`;
 const shopLogo = (size = 56, radius = Math.round(size * 0.28)) => S.logo
   ? html`<img class="logo" src="${S.logo}" width="${size}" height="${size}" alt="Shop logo" style="border-radius:${radius}px;object-fit:cover">`
   : brandLogo(size);
