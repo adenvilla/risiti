@@ -19,6 +19,7 @@ const cartRow = (it, i) => html`<div class="card row cart-row"><div class="grow"
 
 function SaleSheet() {
   const d = U.draft;
+  const totals = saleTotals({ items: d.items, disc: d.disc, vat: S.vat });
   return html`${sheetHeader('New sale')}${quickAddChips()}
   ${sectionLabel('Items' + (d.items.length ? ` (${d.items.length})` : ''))}${d.items.map(cartRow)}
   <div class="card pad12"><div class="row gap8">
@@ -28,6 +29,12 @@ function SaleSheet() {
     <button class="btn soft sm full mt10" data-a="itemAdd">${icon('plus', 17)} Add item</button></div>
   ${sectionLabel('Payment method')}<div class="row gap10">${[['mpesa', 'M-Pesa', 'phone'], ['cash', 'Cash', 'cash']].map(([id, label, ic]) =>
     html`<button class="pay${d.pay === id ? ' on' : ''}" data-a="pay" data-v="${id}">${icon(ic, 18)} ${label}</button>`)}</div>
+  ${d.pay === 'mpesa' ? html`<div class="card mt12">
+    <p class="small bold">Customer pays to:</p>
+    <p class="small">${S.shop.kind || 'Till'} ${S.shop.till || 'not added yet'}</p>
+    <p class="small muted">Amount due: ${moneyH(totals.total)}</p>
+    <p class="xs muted mt6">Ask the customer to send payment, then confirm once received.</p>
+  </div>` : ''}
   ${d.pay === 'mpesa' && !S.shop.till ? html`<div class="note amber mt12 small">${icon('info', 18)}<span>Add your Till number so receipts show how to pay. <button class="link green bold" data-a="shop">Add now</button></span></div>` : ''}
   ${sectionLabel('Customer phone (optional)')}${phoneField('U.draft.phone', d.phone)}
   ${sectionLabel('Discount (KSh)')}<div class="inp"><input data-i="U.draft.disc" data-n="1" inputmode="numeric" placeholder="0" value="${d.disc}" aria-label="Discount"></div>
@@ -42,9 +49,10 @@ function ReceiptSheet() {
   const s = findSale(U.rid);
   if (!s) return html`${sheetHeader('Receipt')}${emptyState('Receipt not found')}`;
   const t = saleTotals(s);
-  const pendingBlock = s.stk
-    ? html`<div class="note amber mt18"><i class="spn"></i><div><b>STK push sent to ${formatPhone(s.phone)}</b><div class="xs mt4">Customer is entering their M-Pesa PIN to pay ${money(t.total)}…</div></div></div>`
-    : html`<button class="btn full mt18" data-a="stkPush">${icon('phone', 18)} Send STK push</button>`;
+  const pendingBlock = s.pay === 'mpesa'
+    ? html`<div class="note amber mt18"><i class="spn"></i><div><b>Awaiting customer payment</b><div class="xs mt4">Customer should pay to ${S.shop.kind || 'Till'} ${S.shop.till || ''}. Confirm only after you receive the money.</div></div></div>
+      <button class="btn full mt18" data-a="markPaid">${icon('check', 18)} Confirm payment received</button>`
+    : '';
   return html`${sheetHeader('Receipt')}
   <div class="rh"><div class="pattern-layer"></div><i class="weave"></i>${shopLogo(54, 16)}<h2 class="mt10 white-t">${S.shop.name || 'My shop'}</h2><span class="xs op mt2">Official receipt${S.shop.loc ? ' · ' + S.shop.loc : ''}</span></div>
   <div class="seal ${s.status}">${icon(s.status === 'paid' ? 'check' : s.status === 'pending' ? 'hist' : 'doc', 22)}</div>
@@ -61,7 +69,7 @@ function ReceiptSheet() {
   <p class="bold my12 mt18 serif lg">Share receipt</p>
   <div class="share">${[['wa', 'WhatsApp', '#DCF8C6', '#25D366'], ['sms', 'SMS', '#E8F4FD', '#3B82F6'], ['copy', 'Copy', '#EEE9DB', '#6B7280'], ['qr', 'QR code', '#F3E8FF', '#7C3AED']].map(([id, name, bg, fg]) =>
     html`<button data-a="share" data-v="${id}"><span style="background:${bg}">${icon(id, 22, fg)}</span>${name}</button>`)}</div>
-  ${s.status === 'pending' ? html`${pendingBlock}<button class="btn ghost full mt10" data-a="markPaid">${icon('check', 18)} Mark as paid manually</button>` : ''}
+  ${s.status === 'pending' ? html`${pendingBlock}` : ''}
   ${s.status === 'draft' ? html`<button class="btn full mt18" data-a="finalise">${icon('send', 18)} Finalise &amp; send</button>` : ''}
   <button class="btn ghost full mt12" data-a="close">Done</button>`;
 }
