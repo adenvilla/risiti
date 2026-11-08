@@ -14,10 +14,42 @@
 #splash .rs-loading-label{font-size:11px;color:#c6d5c9;margin-top:12px;letter-spacing:.2px}
 @keyframes rs-loading{from{transform:scaleX(.2);opacity:.55}to{transform:scaleX(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){#splash .rs-loader i{animation:none;transform:scaleX(.6)}}
+#startup-skeleton{position:absolute;inset:0;overflow:auto;padding:32px 24px;background:#F6F1E7}
+#startup-skeleton .sk-block{background:#e5e8df;border-radius:9px}
+#startup-skeleton .sk-header{height:144px;background:#17382D;border-radius:22px;padding:24px;margin:24px 0}
+#startup-skeleton .sk-header .sk-block{background:#ffffff26}
+#startup-skeleton .sk-line{height:12px;width:60%;margin-bottom:16px}
+#startup-skeleton .sk-short{width:35%}
+#startup-skeleton .sk-stats{display:flex;gap:12px;margin-bottom:24px}
+#startup-skeleton .sk-stat{height:86px;flex:1}
+#startup-skeleton .sk-row{height:64px;margin:12px 0}
+#startup-skeleton .sk-status{font-size:12px;color:#5e6b64;margin:0 0 18px}
+#startup-skeleton .sk-retry{padding:12px 18px;background:#17382D;color:#FFFCF6;border-radius:12px;font-weight:600}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script></head><body>
-<div id="frame"><div id="app"></div><div id="toast" role="status" aria-live="polite"></div><div id="splash" role="status" aria-live="polite" aria-label="Loading Risiti"><img class="logo rs-logo" src="logo.png" width="84" height="84" alt=""><b class="rs-name">Risiti</b><span class="rs-tagline">Smart receipts</span><div class="rs-loader" aria-hidden="true"><i></i></div><span class="rs-loading-label">Opening your workspace…</span></div></div>
+<div id="frame"><div id="app" aria-busy="true"><div id="startup-skeleton"><p class="sk-status" role="status">Loading Risiti…</p><div aria-hidden="true"><div class="sk-block sk-line sk-short"></div><div class="sk-header"><div class="sk-block sk-line"></div><div class="sk-block sk-line sk-short"></div></div><div class="sk-stats"><div class="sk-block sk-stat"></div><div class="sk-block sk-stat"></div></div><div class="sk-block sk-line"></div><div class="sk-block sk-row"></div><div class="sk-block sk-row"></div><div class="sk-block sk-row"></div></div></div></div><div id="toast" role="status" aria-live="polite"></div><div id="splash" role="status" aria-live="polite" aria-label="Loading Risiti"><img class="logo rs-logo" src="logo.png" width="84" height="84" alt=""><b class="rs-name">Risiti</b><span class="rs-tagline">Smart receipts</span><div class="rs-loader" aria-hidden="true"><i></i></div><span class="rs-loading-label">Opening your workspace…</span></div></div>
 <input type="file" id="logo-input" accept="image/*" hidden>
+<script>
+(function(){
+  const app=document.getElementById('app');
+  const hideSplash=()=>{const splash=document.getElementById('splash');if(splash)splash.remove()};
+  let ready=false;
+  const revealTimer=setTimeout(hideSplash,350);
+  const failTimer=setTimeout(()=>{
+    if(ready)return;
+    hideSplash();app.removeAttribute('aria-busy');
+    const shell=document.getElementById('startup-skeleton');if(!shell)return;
+    const status=shell.querySelector('[role="status"]');status.textContent='Risiti could not finish opening. Your saved data has not been cleared.';
+    const placeholders=shell.querySelector('[aria-hidden="true"]');if(placeholders)placeholders.remove();
+    const retry=document.createElement('button');retry.className='sk-retry';retry.textContent='Try again';retry.addEventListener('click',()=>location.reload());shell.appendChild(retry);
+  },12000);
+  const observer=new MutationObserver(()=>{
+    if(document.getElementById('startup-skeleton')||!app.querySelector('.screen'))return;
+    ready=true;clearTimeout(revealTimer);clearTimeout(failTimer);app.removeAttribute('aria-busy');hideSplash();observer.disconnect();
+  });
+  observer.observe(app,{childList:true});
+})();
+</script>
 <script src="js/config.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/utils.js"></script>
