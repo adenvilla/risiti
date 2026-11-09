@@ -1,0 +1,11 @@
+{
+  "passed": 14,
+  "failed": 0,
+  "scope": "Pure reporting and backup-validation unit tests; not browser or live deployment tests",
+  "combined_module_and_worker_syntax": "passed",
+  "deployment": "Not pushed; no browser or deployment test performed",
+  "limitations": [
+    "Tests cover reporting and backup validation, not browser interaction.",
+    "Cash sale, pending payment, void/stock behavior, restore, reload, offline and mobile layout still need browser verification."
+  ]
+}

@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict');const Core=require('../js/reliability.js');let count=0;function check(fn){fn();count++}const sale=(status,pay='cash',p=100)=>({id:status,items:[{n:'Bread',q:2,p}],disc:0,vat:false,status,pay,ts:1,phone:'',note:''});
+check(()=>assert.deepEqual(Core.report([sale('paid'),sale('pending','mpesa'),sale('draft'),sale('voided')]),{recorded:400,received:200,pending:200,paidCount:1,recordedCount:2,cash:200,mpesa:0}));
+check(()=>assert.equal(Core.amount({...sale('paid'),disc:20,vat:true}),209));
+check(()=>assert.equal(Core.report([sale('paid','mpesa')]).mpesa,200));
+check(()=>assert.equal(Core.report([]).recorded,0));
+check(()=>assert.equal(Core.address({town:'Kiambu',street:'Market',landmark:'Shop 12'}),'Market · Shop 12 · Kiambu'));
+const state={v:5,authed:true,done:true,demo:false,vat:false,backup:false,logo:'',flags:{reviewed:false,dismissed:false},shop:{name:'My shop',cat:'Retail Shop',loc:'',till:'',kind:'Till'},products:[{id:'p1',n:'Bread',p:100,stock:4,low:5}],sales:[sale('paid')],customerNames:{'711188464':'Amina'}};
+const backup=()=>JSON.parse(JSON.stringify({format:'risiti-backup',version:1,state}));
+check(()=>assert.deepEqual(Core.validate(backup()),state));
+check(()=>{const b=backup();b.state.sales.push({...b.state.sales[0]});assert.throws(()=>Core.validate(b))});
+check(()=>{const b=backup();b.state.products[0].stock=-1;assert.throws(()=>Core.validate(b))});
+check(()=>{const b=backup();b.state.sales[0].items[0].q=0;assert.throws(()=>Core.validate(b))});
+check(()=>assert.throws(()=>Core.validate(JSON.parse('{"format":"risiti-backup","version":1,"state":{"__proto__":{}}}'))));
+check(()=>{const b=backup();b.state.logo='javascript:alert(1)';assert.throws(()=>Core.validate(b))});
+check(()=>{const b=backup();b.state.shop.coordinates={latitude:200,longitude:0};assert.throws(()=>Core.validate(b))});
+check(()=>{const b=backup();b.state.sales[0].disc=500;assert.throws(()=>Core.validate(b))});
+check(()=>{const b=backup();const out=Core.validate(b);out.shop.name='Changed';assert.equal(b.state.shop.name,'My shop')});
+console.log(JSON.stringify({passed:count,failed:0,scope:'Pure reporting and backup-validation unit tests; not browser or live deployment tests'}));
