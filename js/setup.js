@@ -1,39 +1,29 @@
-/** Complete local-store onboarding. SMS remains simulated, not production authentication. */
+/** Local-store setup. SMS is simulated; location is entered manually. */
 (function(){
   const progress=n=>html`<p class="xs muted mb14">Store setup · Step ${n} of 5</p>`;
+  const categories=[...SHOP_CATEGORIES,'Other'];
+  const initAddress=()=>{if(!U.address){const a=S.shop.address||{};U.address={town:a.town||S.shop.loc||'',street:a.street||'',landmark:a.landmark||'',enabled:S.shop.locationEnabled!==false,visible:S.shop.showLocation!==false}}return U.address};
+  const locationText=()=>{const a=initAddress();return a.enabled&&a.visible?[a.street,a.landmark,a.town].map(v=>String(v||'').trim()).filter(Boolean).join(' · '):''};
   const originalAuth=SCREENS.auth;
   SCREENS.auth=()=>raw(originalAuth().s.replace('<div class="card pad24 rise">','<div class="card pad24 rise"><p class="note amber small mb14">Prototype verification: no SMS is sent. The demo code is 123456. Store data is saved only in this browser.</p>'));
   drawOtp=function(){const box=$('#otp-boxes'),status=$('#otp-status');if(box)box.innerHTML=renderValue(otpBoxes());if(status)status.textContent=U.otp.length===OTP_LENGTH?'Checking demo code…':'Demo code fills automatically; no SMS is sent.'};
-  SCREENS.shop=()=>html`<div class="screen"><div class="scroll">${progress(2)}<h1>Create your store</h1><p class="small muted mt6">These details appear on your receipts.</p>${sectionLabel('Store name')}<div class="inp"><input data-i="U.setup.name" maxlength="40" value="${U.setup.name}" placeholder="e.g. Mama Njeri Store" aria-label="Store name"></div>${sectionLabel('Business category')}<div class="cat-grid">${SHOP_CATEGORIES.map(c=>html`<button class="cat${U.setup.cat===c?' on':''}" data-a="pickCategory" data-v="${c}">${c}</button>`)}</div>${sectionLabel('Location (optional)')}<div class="inp"><input data-i="U.setup.loc" maxlength="50" value="${U.setup.loc||''}" placeholder="e.g. Kiambu" aria-label="Store location"></div>${errorBox()}<button class="btn full mt20" data-a="shopContinue">Continue to payments ${icon('arrow',18)}</button></div></div>`;
+  const field=(id,label,path,value,placeholder,max=80,error='')=>html`<label class="lb" for="${id}">${label}</label><div class="inp"><input id="${id}" data-i="${path}" maxlength="${max}" value="${value}" placeholder="${placeholder}" aria-invalid="${!!error}" ${error?raw(`aria-describedby="${id}-error"`):''}></div>${error?html`<p class="err small mt6" id="${id}-error" role="alert">${error}</p>`:''}`;
+  SCREENS.shop=()=>{const a=initAddress(),e=U.detailsErrors||{};return html`<div class="screen"><div class="scroll"><button class="btn ghost sm mb14" data-a="detailsBack">${icon('chev',16)} Back</button>${progress(2)}<h1>Tell us about your shop</h1><p class="small muted mt6">These details will appear on your receipts. You can edit them later.</p><div class="card row gap14 mt20">${shopLogo(54,14)}<div class="grow"><b class="small block">Shop logo (optional)</b><button class="btn soft sm mt6" data-a="logo2">${icon('image',16)} ${S.logo?'Change logo':'Add logo'}</button></div></div>${field('detail-name','Shop name','U.setup.name',U.setup.name,'e.g. Mama Njeri Store',40,e.name)}<p class="lb">Business category</p><div class="cat-grid" role="group" aria-label="Business category">${categories.map((c,i)=>html`<button class="cat${U.setup.cat===c?' on':''}" aria-pressed="${U.setup.cat===c}" data-a="pickCategory" data-v="${c}">${icon(['shop','cash','image','phone','box','plus'][i]||'shop',20)}${c}</button>`)}</div><div class="row between gap10 mt20"><h2>Where is your shop?</h2><button class="link green small" data-a="toggleSetupLocation">${a.enabled?'Add later':'Enter location'}</button></div><p class="xs muted mt6">Optional. Enter a place customers recognise. No device-location permission is needed.</p>${a.enabled?html`${field('detail-town','Town or area','U.address.town',a.town,'e.g. Kiambu',60,e.town)}${field('detail-street','Estate, street or market (optional)','U.address.street',a.street,'e.g. Kiambu Market')}${field('detail-landmark','Building, shop number or landmark (optional)','U.address.landmark',a.landmark,'e.g. Shop 12, opposite the bus stage')}<button class="srow mt12" role="switch" aria-checked="${a.visible}" data-a="toggleReceiptLocation"><span class="grow"><b>Show location on receipts</b><small>Keep it private if you operate from home.</small></span><span class="sw${a.visible?' on':''}"></span></button>`:html`<p class="note mint small mt12">Location skipped. Your draft address is retained if you choose Enter location.</p>`}<div class="card mt20" aria-label="Live receipt header preview"><p class="xs muted mb12">RECEIPT PREVIEW</p><div class="row gap12">${shopLogo(42,10)}<div class="grow"><b class="block serif" id="detail-preview-name">${U.setup.name.trim()||'Your shop name'}</b><p class="xs muted mt4" id="detail-preview-location">${locationText()||'Location not shown on receipts'}</p><p class="xs muted mt4">Official receipt</p></div></div></div><button class="btn full mt20" data-a="shopContinue">Continue to payments ${icon('arrow',18)}</button></div></div>`};
+  document.addEventListener('input',ev=>{if(U.scr!=='shop')return;const path=ev.target.dataset.i||'';if(path!=='U.setup.name'&&!path.startsWith('U.address.'))return;const n=$('#detail-preview-name'),l=$('#detail-preview-location');if(n)n.textContent=U.setup.name.trim()||'Your shop name';if(l)l.textContent=locationText()||'Location not shown on receipts'});
+  const paymentScreen=SCREENS.payment;
+  SCREENS.payment=()=>raw(paymentScreen().s.replace('<div class="scroll pb140">','<div class="scroll pb140"><button class="btn ghost sm mb14" data-a="backToDetails">Back to shop details</button>'));
   SCREENS.products=()=>html`<div class="screen"><div class="scroll">${progress(4)}<h1>Add your products</h1><p class="small muted mt6 mb14">Add your own items and prices. Opening stock is optional. No sample sales or customers are added.</p>${productEditor()}<p class="xs muted mt14">You can add more products later in Products &amp; stock.</p><button class="btn full mt20" data-a="completeStore">${S.products.length?'Finish creating store':'Finish with no products'}</button><button class="btn ghost full mt12" data-a="setupPaymentBack">Back to payment details</button></div></div>`;
   SCREENS.ready=()=>html`<div class="screen"><div class="scroll">${progress(5)}<h1>Your store is ready</h1><div class="card mt16"><h2>${S.shop.name}</h2><p class="small muted mt6">${S.shop.cat}${S.shop.loc?' · '+S.shop.loc:''}</p><p class="small mt12">${S.products.length} products · ${S.shop.till?S.shop.kind+' '+S.shop.till:'Payment details can be added later'}</p></div><p class="small muted mt14">Your store is saved on this browser. No sample transactions have been added.</p><button class="btn full mt20" data-a="setupFirstSale">${icon('plus',18)} Make your first sale</button><button class="btn ghost full mt12" data-a="openDashboard">Go to my dashboard</button></div></div>`;
-  Actions.start=function(){
-    stopAutofill();
-    if(S.demo){if(!confirm('Leave the sample shop and create your own store? This removes sample data from this browser.'))return;Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,blankState());saveState()}
-    U.setup={name:S.shop.name||'',cat:S.shop.cat||SHOP_CATEGORIES[0],loc:S.shop.loc||''};
-    Object.assign(U,{phone:S.lastPhone||'',otp:'',otpSent:false,err:'',draft:emptyDraft(),newProd:{n:'',p:'',s:''}});
-    go('auth');
-  };
-  Actions.shopContinue=function(){
-    const name=U.setup.name.trim();
-    if(!name){U.err='Enter your store name';render();return}
-    if(!SHOP_TYPES[U.setup.cat]){U.err='Choose a business category';render();return}
-    S.shop={...S.shop,name,cat:U.setup.cat,loc:String(U.setup.loc||'').trim()};
-    U.shopEdit={...S.shop,kind:S.shop.kind||'Till'};saveState();go('payment');
-  };
-  Actions.finishSetup=function(){
-    const h=U.shopEdit||{},till=String(h.till||'').trim();
-    if(till&&!/^\d{5,7}$/.test(till)){toast('Till or Paybill should be 5–7 digits');return}
-    S.shop={...S.shop,kind:h.kind==='Paybill'?'Paybill':'Till',till};saveState();go('products');
-  };
+  Actions.start=function(){stopAutofill();if(S.demo){if(!confirm('Leave the sample shop and create your own store? This removes sample data from this browser.'))return;Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,blankState());saveState()}U.setup={name:S.shop.name||'',cat:S.shop.cat||SHOP_CATEGORIES[0],loc:S.shop.loc||''};delete U.address;initAddress();Object.assign(U,{phone:S.lastPhone||'',otp:'',otpSent:false,err:'',detailsErrors:{},draft:emptyDraft(),newProd:{n:'',p:'',s:''}});go('auth')};
+  Actions.toggleSetupLocation=function(){const a=initAddress();a.enabled=!a.enabled;U.detailsErrors={};render()};
+  Actions.toggleReceiptLocation=function(){const a=initAddress();a.visible=!a.visible;render()};
+  Actions.detailsBack=function(){stopAutofill();U.otpSent=false;go('auth')};
+  Actions.backToDetails=function(){go('shop')};
+  Actions.shopContinue=function(){const a=initAddress(),name=U.setup.name.trim(),town=a.town.trim(),street=a.street.trim(),landmark=a.landmark.trim();U.detailsErrors={};if(!name)U.detailsErrors.name='Enter your shop name';if(a.enabled&&(town||street||landmark)&&!town)U.detailsErrors.town='Add the town or area, or choose Add later';if(Object.keys(U.detailsErrors).length){render();const input=$(U.detailsErrors.name?'#detail-name':'#detail-town');if(input)input.focus();return}if(!categories.includes(U.setup.cat)){toast('Choose a business category');return}S.shop={...S.shop,name,cat:U.setup.cat,address:{town,street,landmark},locationEnabled:a.enabled,showLocation:a.visible,loc:locationText()};U.setup.loc=S.shop.loc;U.shopEdit={...S.shop,kind:S.shop.kind||'Till'};saveState();go('payment')};
+  Actions.finishSetup=function(){const h=U.shopEdit||{},till=String(h.till||'').trim();if(till&&!/^\d{5,7}$/.test(till)){toast('Till or Paybill should be 5–7 digits');return}S.shop={...S.shop,kind:h.kind==='Paybill'?'Paybill':'Till',till};saveState();go('products')};
   Actions.skipPayment=function(){S.shop={...S.shop,till:''};saveState();go('products')};
   Actions.setupPaymentBack=function(){U.shopEdit={...S.shop};go('payment')};
-  Actions.completeStore=function(){
-    if(!S.authed){go('auth');return}
-    if(!S.shop.name.trim()){go('shop');return}
-    if(U.newProd.n.trim()||U.newProd.p!==''||U.newProd.s!==''){toast('Add the product with Add product, or clear its fields before finishing');return}
-    S.done=true;S.demo=false;S.flags={...S.flags,reviewed:S.products.length>0};saveState();go('ready');
-  };
+  Actions.completeStore=function(){if(!S.authed){go('auth');return}if(!S.shop.name.trim()){go('shop');return}if(U.newProd.n.trim()||U.newProd.p!==''||U.newProd.s!==''){toast('Add the product with Add product, or clear its fields before finishing');return}S.done=true;S.demo=false;S.flags={...S.flags,reviewed:S.products.length>0};saveState();go('ready')};
   Actions.openDashboard=function(){if(!S.done){go('shop');return}U.tab='home';go('main')};
   Actions.setupFirstSale=function(){if(!S.done){go('shop');return}U.tab='home';go('main');Actions.newSale()};
 })();
