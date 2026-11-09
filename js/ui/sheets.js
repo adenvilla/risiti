@@ -1,4 +1,4 @@
-/** Risiti - bottom sheets: new sale, receipt, stock, shop details, daily summary. */
+/** Risiti - bottom sheets: new sale, receipt, stock, shop details, daily summary, export. */
 
 const inCart = (name) => (U.draft.items.find((i) => i.n === name) || { q: 0 }).q;
 /** True when the cart may take one more unit without exceeding tracked stock. */
@@ -33,7 +33,7 @@ function SaleSheet() {
     <p class="small bold">Customer pays to:</p>
     <p class="small">${S.shop.kind || 'Till'} ${S.shop.till || 'not added yet'}</p>
     <p class="small muted">Amount due: ${moneyH(totals.total)}</p>
-    <p class="xs muted mt6">Ask the customer to send payment, then confirm once received.</p>
+    <p class="small muted">Ask the customer to send payment, then confirm once received.</p>
   </div>` : ''}
   ${d.pay === 'mpesa' && !S.shop.till ? html`<div class="note amber mt12 small">${icon('info', 18)}<span>Add your Till number so receipts show how to pay. <button class="link green bold" data-a="shop">Add now</button></span></div>` : ''}
   ${sectionLabel('Customer phone (optional)')}${phoneField('U.draft.phone', d.phone)}
@@ -66,7 +66,7 @@ function ReceiptSheet() {
       ${s.phone ? html`<span class="chip sm static">${formatPhone(s.phone)}</span>` : ''}${s.ref ? html`<span class="chip sm static ok-chip">M-Pesa ref ${s.ref}</span>` : ''}</div>
     ${s.note ? html`<p class="small muted mt12">Note: ${s.note}</p>` : ''}
     ${s.status === 'voided' ? html`<div class="stamp" style="border-color:var(--red);color:var(--red);">VOIDED</div>${s.voidReason ? html`<p class="small muted mt12">Reason: ${s.voidReason}</p>` : ''}` : s.status === 'paid' ? html`<div class="stamp">PAID</div>` : ''}
-    <p class="small bold center-t mt16 serif">Thank you for your business</p><p class="xs faint center-t">Powered by Risiti</p></div>
+    <p class="small bold center-t mt16 serif">Thank you for your business</p><p class="xs faint center-t">Powered by Risitip</p></div>
   ${U.showQr ? html`<div class="card center-t mt12"><div class="qr-box">${qrSvg(`RISITI ${s.id} | ${S.shop.name} | ${money(t.total)}${S.shop.till ? ` | ${S.shop.kind} ${S.shop.till}` : ''}`)}</div><p class="xs faint mt8">Scan to view receipt details</p></div>` : ''}
   <p class="bold my12 mt18 serif lg">Share receipt</p>
   <div class="share">${[['wa', 'WhatsApp', '#DCF8C6', '#25D366'], ['sms', 'SMS', '#E8F4FD', '#3B82F6'], ['copy', 'Copy', '#EEE9DB', '#6B7280'], ['qr', 'QR code', '#F3E8FF', '#7C3AED']].map(([id, name, bg, fg]) =>
@@ -108,5 +108,50 @@ function SummarySheet() {
   <button class="btn ghost full mt10" data-a="summaryCopy">${icon('copy', 18)} Copy summary</button>`;
 }
 
-const SHEETS = { sale: SaleSheet, receipt: ReceiptSheet, stock: StockSheet, shop: ShopSheet, summary: SummarySheet };
+function exportRangeList() {
+  const e = U.export || { range: 'This month', from: '', to: '' };
+  let list = [...S.sales];
+  if (e.range === 'Custom') {
+    const from = e.from ? new Date(e.from + 'T00:00:00').getTime() : 0;
+    const to = e.to ? new Date(e.to + 'T23:59:59').getTime() : Infinity;
+    list = list.filter((s) => s.ts >= from && s.ts <= to);
+  } else list = list.filter((s) => inPeriod(s.ts, e.range));
+  return list.sort((a, b) => a.ts - b.ts);
+}
+
+function ExportSheet() {
+  const e = U.export || { type: 'sales', range: 'This month', from: '', to: '' };
+  const list = exportRangeList(), active = list.filter((s) => s.status !== 'voided');
+  const total = active.reduce((a, s) => a + saleTotals(s).total, 0);
+  const types = [
+    ['sales', 'Sales report', 'Every receipt, item by item'],
+    ['summary', 'Daily summary', 'Revenue by day'],
+    ['stock', 'Products & stock', 'Sales and current stock'],
+    ['customers', 'Customers', 'Spending by phone number'],
+    ['backup', 'Full backup', 'All shop data as JSON'],
+  ];
+  const ranges = ['Today', 'This week', 'This month', 'Custom'];
+  const preview = e.type === 'stock'
+    ? `${S.products.length} product${S.products.length === 1 ? '' : 's'}`
+    : e.type === 'customers'
+      ? `${new Set(active.filter((s) => s.phone).map((s) => s.phone)).size} customer${new Set(active.filter((s) => s.phone).map((s) => s.phone)).size === 1 ? '' : 's'}`
+      : e.type === 'backup'
+        ? `${S.sales.length} receipt${S.sales.length === 1 ? '' : 's'} · ${S.products.length} product${S.products.length === 1 ? '' : 's'}`
+        : `${active.length} receipt${active.length === 1 ? '' : 's'} · ${moneyH(total)}`;
+  return html`${sheetHeader('Export data')}
+  ${sectionLabel('What to export')}<div class="row wrap gap8">${types.map(([id, label, sub]) =>
+    html`<button class="chip${e.type === id ? ' on' : ''}" data-a="exportType" data-v="${id}">${label}</button>`)}</div>
+  <p class="xs muted mt6">${(types.find((t) => t[0] === e.type) || types[0])[2]}</p>
+  ${sectionLabel('Period')}<div class="row gap8 scroll-x">${ranges.map((r) =>
+    html`<button class="chip${e.range === r ? ' on' : ''}" data-a="exportRange" data-v="${r}">${r}</button>`)}</div>
+  ${e.range === 'Custom' ? html`<div class="row gap8 mt10">
+    <div class="inp sm" style="flex:1"><input type="date" data-i="U.export.from" value="${e.from}" aria-label="Start date"></div>
+    <div class="inp sm" style="flex:1"><input type="date" data-i="U.export.to" value="${e.to}" aria-label="End date"></div></div>` : ''}
+  <div class="card mt14 row between"><div><span class="eyebrow-d tight">Ready to export</span><b class="block">${preview}</b></div>
+    <span class="chip sm static mint">Works offline</span></div>
+  <button class="btn full mt16" data-a="exportRun">${icon('download', 18)} Export ${e.type === 'backup' ? 'backup' : 'CSV'}</button>
+  <p class="xs faint center-t mt10">Your file saves to this device. No data is uploaded.</p>`;
+}
+
+const SHEETS = { sale: SaleSheet, receipt: ReceiptSheet, stock: StockSheet, shop: ShopSheet, summary: SummarySheet, export: ExportSheet };
 const Sheet = () => html`<div class="ov" data-a="overlay"><div class="sheet${U.sheetIn ? ' up' : ''}" role="dialog" aria-modal="true">${SHEETS[U.sheet]()}</div></div>`;

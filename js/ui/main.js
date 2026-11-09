@@ -6,7 +6,7 @@ function sparkline(values) {
   return raw(`<svg class="spark" viewBox="0 0 100 36" preserveAspectRatio="none" aria-hidden="true">
     <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E6C877" stop-opacity=".32"/><stop offset="1" stop-color="#E6C877" stop-opacity="0"/></linearGradient></defs>
     <polygon points="0,36 ${pts.join(' ')} 100,36" fill="url(#sg)"/>
-    <polyline points="${pts.join(' ')}" fill="none" stroke="#E6C877" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`);
+    <polyline points="${pts.join(' ')}" fill="none" stroke="#E6C877" stroke-width="1.6" vector-effect="non-scaling-strokesvg"/></svg>`);
 }
 
 const deltaPill = () => {
@@ -100,7 +100,7 @@ function SettingsTab() {
   const groups = [
     ['Shop profile', [linkRow('image', 'Change logo', 'Upload a photo', 'logo2'), linkRow('cash', 'Payment details', tillLabel(), 'shop'),
       linkRow('box', 'Products & stock', low ? `${S.products.length} items · ${low} low` : `${S.products.length} items`, 'stock')]],
-    ['Reports', [linkRow('chart', 'Daily summary', 'Review and share on WhatsApp', 'summary'), linkRow('doc', 'Export data', 'Download sales as CSV', 'exportCsv')]],
+    ['Reports', [linkRow('chart', 'Daily summary', 'Review and share on WhatsApp', 'summary'), linkRow('doc', 'Export data', 'Sales, stock & customers', 'exportCsv')]],
     ['Tax', [switchRow('pct', 'Enable VAT (16%)', 'Added to every new sale', 'toggleVat', S.vat)]],
     ['Preferences', [(window.matchMedia && matchMedia('(display-mode: standalone)').matches) ? '' : linkRow('plus', 'Install Risiti', 'Add to your home screen', 'install'),
       switchRow('save', 'Auto-backup', 'Save a copy on this device', 'toggleBackup', S.backup)]],
