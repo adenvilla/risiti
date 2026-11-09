@@ -8,3 +8,4 @@ Restaurant:{emoji:'🍽️',starter:[['Tea',30],['Chapati',20],['Mandazi',10],['
 'Tech Shop':{emoji:'📱',starter:[['Phone screen',2500],['Charger',600],['Earphones',500],['Phone case',400],['Airtime',100],['Repair fee',1000]]},
 Pharmacy:{emoji:'💊',starter:[['Panadol',50],['Cough syrup',250],['Bandage',80],['Vitamin C',300],['Face mask',20],['Sanitiser',150]]}};
 const SHOP_CATEGORIES=Object.keys(SHOP_TYPES);
+const WELCOME_POINTS=[['rec','Professional receipts','Share on WhatsApp or SMS in a few taps'],['phone','Clear payments','Show your Till or Paybill and confirm once paid'],['box','Stock you can track','See what is running low before it runs out']];
