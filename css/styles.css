@@ -22,3 +22,41 @@
 .sheet-header{padding:18px 20px 12px;border-bottom:1px solid rgba(15,23,42,.06)}
 .sheet-body{padding:16px 20px calc(24px + var(--safe-b))}
 @media(prefers-reduced-motion:reduce){.card,.inp,.btn,.chip,.tile,.task,.item,.srow,.receipt,.summary-block{transition:none}}
+
+/* Match the current WelcomeScreen rw-* markup. */
+.screen.rw-welcome{display:flex;flex-direction:column;gap:22px;padding:24px 24px calc(24px + var(--safe-b,0px));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;color:#FFFCF6}
+.rw-welcome>*{flex-shrink:0;min-width:0}
+.rw-welcome .rw-header{display:flex;align-items:center;gap:12px}
+.rw-welcome .rw-header .logo{display:block;flex:none}
+.rw-welcome .rw-brand{display:block;font-family:var(--serif);font-size:24px;line-height:1.2}
+.rw-welcome .rw-tagline{display:block;font-size:11px;color:#dae5dc;margin-top:3px;letter-spacing:.5px}
+.rw-welcome .rw-body{display:flex;flex-direction:column;gap:22px;flex:1 0 auto;justify-content:center}
+.rw-welcome .rw-eyebrow{display:block;font-size:10px;line-height:1.5;letter-spacing:1.8px;font-weight:700;color:#E6C877}
+.rw-welcome .rw-title{font-family:var(--serif);font-size:40px;line-height:1.08;letter-spacing:-1px;margin:12px 0;color:#FFFCF6}
+.rw-welcome .rw-title em{color:#E6C877}
+.rw-welcome .rw-description{font-size:14px;line-height:1.6;color:#dae5dc;margin:0;max-width:380px}
+.rw-welcome .rw-preview{border:1px solid #E6C87738;border-radius:20px;background:#ffffff08;padding:14px}
+.rw-welcome .rw-preview-label{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:10px;line-height:1.5;color:#dae5dc;margin-bottom:12px}
+.rw-welcome .rw-preview-label>span:last-child{flex:none;color:#c4d2c8}
+.rw-welcome .rw-receipt{background:#FFFCF6;color:#17382D;border-radius:12px;padding:18px}
+.rw-welcome .rw-shop{display:block;font-family:var(--serif);font-size:18px;line-height:1.3}
+.rw-welcome .rw-caption{font-size:10px;color:#68766c;margin:4px 0 0}
+.rw-welcome .rw-rule{border-top:1px dashed #d9d1bf;margin:12px 0}
+.rw-welcome .rw-line,.rw-welcome .rw-total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12px;line-height:1.5;margin:8px 0}
+.rw-welcome .rw-line>b,.rw-welcome .rw-total>b{flex:none;white-space:nowrap}
+.rw-welcome .rw-total{margin-bottom:0}
+.rw-welcome .rw-total>b{font-family:var(--serif);font-size:23px}
+.rw-welcome .rw-share{display:flex;align-items:center;gap:8px;color:#dae5dc;font-size:11px;line-height:1.5;padding-top:12px}
+.rw-welcome .rw-share svg{flex:none}
+.rw-welcome .rw-benefits{display:flex;flex-direction:column;gap:14px}
+.rw-welcome .rw-benefit{display:flex;align-items:flex-start;gap:12px}
+.rw-welcome .rw-benefit-icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:10px;color:#E6C877;background:#ffffff0d;border:1px solid #E6C87726}
+.rw-welcome .rw-benefit b{display:block;font-size:12px;line-height:1.5}
+.rw-welcome .rw-benefit small{display:block;font-size:11px;line-height:1.5;color:#c4d2c8;margin-top:2px}
+.rw-welcome .rw-footer{display:flex;flex-direction:column;gap:14px;margin-top:auto}
+.rw-welcome .rw-start{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:50px;padding:12px 18px;border-radius:14px;background:#E6C877;color:#17382D;font-size:15px;font-weight:700;text-align:center}
+.rw-welcome .rw-links{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 24px}
+.rw-welcome .rw-links button{min-height:44px;padding:8px 0;font-size:12px;color:#FFFCF6;text-decoration:underline;text-underline-offset:4px}
+.rw-welcome .rw-note{font-size:10px;line-height:1.5;text-align:center;color:#c4d2c8;margin:0}
+@media(max-height:740px){.screen.rw-welcome{gap:16px;padding-top:18px}.rw-welcome .rw-body{gap:16px}.rw-welcome .rw-title{font-size:34px;margin:8px 0}.rw-welcome .rw-benefits{gap:10px}.rw-welcome .rw-receipt{padding:14px}.rw-welcome .rw-footer{gap:8px}}
+@media(max-width:350px){.screen.rw-welcome{padding-left:18px;padding-right:18px}.rw-welcome .rw-title{font-size:32px}.rw-welcome .rw-preview-label{font-size:9px}.rw-welcome .rw-line{font-size:11px}}
